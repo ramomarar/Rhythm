@@ -81,6 +81,8 @@ We followed a 4-step iterative design cycle:
 
 ### ✅ Workflow
 
+PLEASE ENSURE TO TICK OFF EACH TASK IN TaskDelegation.md AS YOU COMMIT EACH KEY FEATURE OR STEP
+
 ```bash
 # Create and switch to a new branch
 git checkout -b feature/task-editor
