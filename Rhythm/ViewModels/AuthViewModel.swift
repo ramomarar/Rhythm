@@ -22,20 +22,26 @@ class AuthViewModel: ObservableObject {
         isLoading = true
         error = nil
         
+        defer {
+            isLoading = false
+        }
+        
         do {
             try await Auth.auth().signIn(withEmail: email, password: password)
             isAuthenticated = true
         } catch {
             self.error = error.localizedDescription
             throw error
-        } finally {
-            isLoading = false
         }
     }
     
     func createAccount(withEmail email: String, password: String) async throws {
         isLoading = true
         error = nil
+        
+        defer {
+            isLoading = false
+        }
         
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
@@ -49,8 +55,6 @@ class AuthViewModel: ObservableObject {
         } catch {
             self.error = error.localizedDescription
             throw error
-        } finally {
-            isLoading = false
         }
     }
     
