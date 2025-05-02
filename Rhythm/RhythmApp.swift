@@ -22,7 +22,7 @@ struct RhythmApp: App {
     
     var body: some Scene {
         WindowGroup {
-            SignInView()
+            AuthLandingView()
         }
     }
 }
