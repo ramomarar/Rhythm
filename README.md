@@ -1,184 +1,101 @@
 # Rhythm
-
-Rhythm is a minimalist, intelligent task scheduler and Pomodoro timer designed for focused, time-efficient work. It helps users manage their time realistically by estimating task durations and integrating them into a smooth workflow using Pomodoro-based sessions.
-
----
-
-## 🌟 Target Audience
-
-Rhythm is built for busy students, freelancers, and professionals who struggle with time estimation and task planning. These users value simplicity, intelligent scheduling, and frictionless time management.
+Rhythm is a focused task scheduler and Pomodoro timer for iOS, built in SwiftUI. It helps users manage time realistically by estimating task durations and scheduling them into Pomodoro-based work sessions. The interface is kept minimal and intuitive.
 
 ---
 
-## 💡 Problem Being Solved
+## 🎯 Target Audience
 
-Traditional to-do lists and calendars often lack realistic time estimation and require manual planning. Rhythm solves this by:
-- Automatically estimating task durations
-- Scheduling tasks into focused work blocks (Pomodoro sessions)
-- Keeping the interface clean and non-overwhelming
-
----
-
-## 🔍 Comparison to Existing Solutions
-
-| Feature             | Rhythm         | Motion          | Todoist        |
-|---------------------|----------------|------------------|----------------|
-| Time estimation     | ✅ Smart Estimation | ✅ (via AI)      | ❌             |
-| Pomodoro integration| ✅ Built-in     | ❌               | ⚠️ (via plugin) |
-| Simplicity          | ✅ Minimal UI   | ❌ Over-featured | ✅              |
-| Real-time planning  | ✅ Seamless     | ✅               | ❌              |
-
-Rhythm finds a balance between automation and usability, integrating planning and time tracking more fluidly than its competitors.
+Rhythm is designed for:
+- University students managing deadlines
+- Freelancers and creatives juggling flexible work
+- Busy professionals aiming to improve focus and task planning
 
 ---
 
-## 🎮 How to Use Rhythm
+## 💡 Problem Solved
 
-1. **Create a Task**  
-   Add a task with a title and optional estimate.
-
-2. **Auto-Schedule**  
-   Tasks are auto-sorted into Pomodoro sessions based on priority and time blocks.
-
-3. **Start a Session**  
-   Use the Pomodoro timer to begin focused work. Short and long breaks are built-in.
-
-4. **Track & Adjust**  
-   Adjust task estimates over time; the app adapts future sessions based on your actual performance.
+Typical to-do list apps don’t help users realistically plan their day or stay focused. Rhythm solves this by:
+- Estimating task durations and auto-scheduling
+- Using Pomodoro cycles to structure focus time
+- Simplifying the UX to avoid overwhelm
 
 ---
 
-## 🛠️ Frameworks & Services
+## 🆚 Compared to Other Apps
 
-- **Frontend**: React with Vite
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Backend**: Firebase (Auth, Firestore, Hosting)
-- **Timer Engine**: Custom-built hook-based Pomodoro system
+| Feature             | Rhythm (iOS)   | Motion (Web)     | Things (iOS)     |
+|---------------------|----------------|------------------|------------------|
+| Smart Estimation     | ✅ Yes         | ✅ Yes           | ❌ No             |
+| Pomodoro Integration | ✅ Built-in    | ❌               | ❌                |
+| Native Experience    | ✅ SwiftUI     | ❌ Web-only      | ✅                |
+| Task Adaptation      | ✅ Dynamic     | ⚠️ Partial        | ❌ Manual only    |
 
 ---
 
-## ⚔️ Biggest Challenge
+## 📱 How to Use
 
-### Challenge: Seamless Integration of Timer + Task Scheduler
+1. Add a task with a title and optional time estimate
+2. Tasks are sorted into Pomodoro sessions automatically
+3. Start a session and work through the timer
+4. Take built-in breaks to reset focus
+5. Track your productivity over time
 
-Building a responsive system that updates the timer state while also rescheduling tasks in real-time was non-trivial. This required designing a shared context with an event-driven architecture in React. We solved it using:
-- `useReducer` for state consistency
-- Debounced task rescheduling logic
-- State snapshots for rollback if interrupted
+---
+
+## 🛠️ Tech Stack
+
+- **Language**: Swift 5.9
+- **UI Framework**: SwiftUI 3.0
+- **Data Layer**: Combine + CoreData (or optional Firebase)
+- **Architecture**: MVVM
+- **Timer Engine**: Custom Countdown + Background Sync
+
+---
+
+## 💥 Biggest Challenge
+
+**Challenge:** Synchronizing Pomodoro state across app background/foreground and when switching views  
+**Solution:** Used `@AppStorage` for persistence + `ScenePhase` monitoring to pause/resume accurately when user exits app.
 
 ---
 
 ## 🔁 MVP & Iteration Strategy
 
-We followed an iterative product design cycle:
-1. **Research**: Analyzed competitor apps and interviewed target users.
-2. **Prototype**: Low-fidelity Figma mockups, then high-fidelity clickable designs.
-3. **Build**: Implemented core features — task entry, scheduling, and timer.
-4. **Test & Improve**: Weekly user testing and adjustments.
-5. **Polish**: Final week used for animation, responsiveness, and bug fixes.
+We followed a 4-step iterative design cycle:
+
+1. **Planning**: Whiteboarding flows + competitor research
+2. **Prototype**: Low-fi SwiftUI mockups with hardcoded tasks
+3. **MVP Build**: Timer logic, task persistence, UI polish
+4. **Testing**: User feedback → added adaptive scheduling
 
 ---
 
-## 👩‍💻 Github Collaboration Guide
+## 🤝 GitHub Collaboration
 
-### 🧾 Repository Setup
+### 📂 Branching Strategy
 
-Clone the project:
+- `main`: Stable release
+- `develop`: Staging / integration branch
+- `feature/*`: Individual features
+- `bugfix/*`: Targeted fixes
+
+### ✅ Workflow
 
 ```bash
-git clone https://github.com/your-org/rhythm.git
-cd rhythm
-npm install
-````
+# Create and switch to a new branch
+git checkout -b feature/task-editor
 
-### 🌿 Branching Strategy
+# Stage changes
+git add .
 
-* **main**: Stable production-ready code
-* **dev**: Staging branch for new features
-* **feature/**\*: New features (`feature/timer`, `feature/task-form`)
-* **bugfix/**\*: Fixes (`bugfix/sync-error`)
-* **hotfix/**\*: Urgent production patches
+# Commit
+git commit -m "Add editable task view"
 
-```bash
-git checkout -b feature/your-feature-name
-```
+# Push and create pull request
+git push origin feature/task-editor
+All code changes must go through a PR, reviewed by at least one team member.
 
-### ✅ Making a Pull Request
+📦 Submission Info
+Include this README.md and your GitHub repo URL in your final Canvas submission.
 
-1. Push your branch:
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-2. Go to GitHub → Open a Pull Request to `dev` branch
-
-3. Add reviewers from your team
-
-4. Include:
-
-   * What the feature does
-   * Screenshots if needed
-   * Any known bugs or limitations
-
-5. Only merge after approval and successful CI tests
-
----
-
-## 🧠 Code Structure
-
-```
-/src
-  /components       → Reusable UI components
-  /hooks            → Custom React hooks (e.g. usePomodoro)
-  /pages            → Main views (Dashboard, TaskList)
-  /store            → Zustand global store
-  /utils            → Helpers, formatters
-```
-
----
-
-## ✅ Assessment Criteria: Code
-
-* **✅ Data Modeling**
-  Task objects are structured with `id`, `title`, `estimatedTime`, `status`, and `actualTime`. Firestore handles persistence.
-
-* **✅ Immutability & Type Safety**
-  All state updates use immutability principles. TypeScript enforces structure and prevents invalid state.
-
-* **✅ Functional Separation**
-  UI, logic, and state are modular and separated. Pomodoro logic is isolated in a custom hook.
-
-* **✅ Loose Coupling**
-  Pages and components interact via props or global store — easy to swap or reuse modules.
-
-* **✅ Extensibility**
-  Adding new features (e.g. tags, dark mode) requires minimal structural changes thanks to modularity.
-
-* **✅ Error Handling**
-  User input is validated (no empty tasks, invalid time). Timer handles edge cases (paused sessions, task deletions during focus).
-
-* **✅ Github Collaboration**
-  Each team member contributes via separate branches and PRs. All code is peer-reviewed.
-
----
-
-## 📦 Submission
-
-This README and the GitHub repository URL must be included in the final zip submission on Canvas.
-
-GitHub URL: [https://github.com/your-org/rhythm](https://github.com/your-org/rhythm)
-
----
-
-## 📽️ Final Presentation
-
-Your team will present Rhythm during Week 12 lab session:
-
-* Describe the app and user problem
-* Compare with competitors
-* Walk through key features and tech choices
-* Reflect on biggest challenges
-* Show how the MVP evolved
-
+GitHub Repo: [https://github.com/MForemxn/Rhythm](https://github.com/MForemxn/Rhythm)
