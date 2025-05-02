@@ -10,12 +10,12 @@
 - [X] Install Firebase SDKs via Swift Package Manager
 - [X] Configure `GoogleService-Info.plist` in Xcode
 - [X] Create and Implement User Signup and Login Page
-- [ ] Implement Firebase **Email/Password Auth**
-- [ ] Create `UserSession` model & bind to SwiftUI state
-- [ ] Build `TaskDataService.swift` to read/write tasks (Firestore)
-- [ ] Sync task data to `TaskViewModel`
-- [ ] Handle loading states and error messages
-- [ ] Secure user-scoped data (per UID)
+- [X] Implement Firebase **Email/Password Auth**
+- [X] Create `UserSession` model & bind to SwiftUI state
+- [X] Build `TaskDataService.swift` to read/write tasks (Firestore)
+- [X] Sync task data to `TaskViewModel`
+- [X] Handle loading states and error messages
+- [X] Secure user-scoped data (per UID)
 
 ---
 

@@ -66,7 +66,7 @@ struct TaskListView: View {
     }
     
     private func deleteTasks(at offsets: IndexSet) {
-        Task {
+        Swift.Task {
             for index in offsets {
                 let task = taskService.tasks[index]
                 if let id = task.id {
