@@ -9,7 +9,7 @@
 - [X] Set up Firebase project and add iOS app
 - [X] Install Firebase SDKs via Swift Package Manager
 - [X] Configure `GoogleService-Info.plist` in Xcode
-- [ ] Create and Implement User Signup and Login Page
+- [X] Create and Implement User Signup and Login Page
 - [ ] Implement Firebase **Email/Password Auth**
 - [ ] Create `UserSession` model & bind to SwiftUI state
 - [ ] Build `TaskDataService.swift` to read/write tasks (Firestore)
