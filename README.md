@@ -14,7 +14,7 @@ Rhythm is designed for:
 
 ## 💡 Problem Solved
 
-Typical to-do list apps don’t help users realistically plan their day or stay focused. Rhythm solves this by:
+Typical to-do list apps don't help users realistically plan their day or stay focused. Rhythm solves this by:
 - Estimating task durations and auto-scheduling
 - Using Pomodoro cycles to structure focus time
 - Simplifying the UX to avoid overwhelm
@@ -46,9 +46,13 @@ Typical to-do list apps don’t help users realistically plan their day or stay 
 
 - **Language**: Swift 5.9
 - **UI Framework**: SwiftUI 3.0
-- **Data Layer**: Combine + CoreData (or optional Firebase)
+- **Data Layer**: Combine + CoreData + Firebase
 - **Architecture**: MVVM
 - **Timer Engine**: Custom Countdown + Background Sync
+- **Dependencies**:
+  - Firebase/Auth
+  - Firebase/Firestore
+  - Firebase/Core
 
 ---
 
