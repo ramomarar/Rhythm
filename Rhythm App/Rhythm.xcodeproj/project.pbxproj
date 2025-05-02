@@ -6,6 +6,33 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		918FC4FC2DC49DA60007616C /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F62DC49DA60007616C /* TaskDetailView.swift */; };
+		918FC4FD2DC49DA60007616C /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4DE2DC49DA60007616C /* Session.swift */; };
+		918FC4FE2DC49DA60007616C /* RhythmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4E52DC49DA60007616C /* RhythmApp.swift */; };
+		918FC4FF2DC49DA60007616C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F52DC49DA60007616C /* SettingsView.swift */; };
+		918FC5002DC49DA60007616C /* PomodoroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F42DC49DA60007616C /* PomodoroView.swift */; };
+		918FC5012DC49DA60007616C /* RhythmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4E62DC49DA60007616C /* RhythmTests.swift */; };
+		918FC5022DC49DA60007616C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4E12DC49DA60007616C /* Constants.swift */; };
+		918FC5032DC49DA60007616C /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4EF2DC49DA60007616C /* SettingsViewModel.swift */; };
+		918FC5042DC49DA60007616C /* TaskDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4ED2DC49DA60007616C /* TaskDataService.swift */; };
+		918FC5052DC49DA60007616C /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F02DC49DA60007616C /* TaskViewModel.swift */; };
+		918FC5062DC49DA60007616C /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4EB2DC49DA60007616C /* NotificationService.swift */; };
+		918FC5072DC49DA60007616C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F32DC49DA60007616C /* HomeView.swift */; };
+		918FC5082DC49DA60007616C /* TaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F72DC49DA60007616C /* TaskListView.swift */; };
+		918FC5092DC49DA60007616C /* TimerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F82DC49DA60007616C /* TimerControlsView.swift */; };
+		918FC50A2DC49DA60007616C /* RhythmUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4E92DC49DA60007616C /* RhythmUITestsLaunchTests.swift */; };
+		918FC50B2DC49DA60007616C /* RhythmUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4E82DC49DA60007616C /* RhythmUITests.swift */; };
+		918FC50C2DC49DA60007616C /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4DF2DC49DA60007616C /* Task.swift */; };
+		918FC50D2DC49DA60007616C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4D82DC49DA60007616C /* ContentView.swift */; };
+		918FC50E2DC49DA60007616C /* PomodoroScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4EC2DC49DA60007616C /* PomodoroScheduler.swift */; };
+		918FC50F2DC49DA60007616C /* TimerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4DC2DC49DA60007616C /* TimerHelper.swift */; };
+		918FC5102DC49DA60007616C /* TimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4F12DC49DA60007616C /* TimerViewModel.swift */; };
+		918FC5112DC49DA60007616C /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918FC4D92DC49DA60007616C /* Date+Extensions.swift */; };
+		918FC5122DC49DA60007616C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 918FC4D72DC49DA60007616C /* Assets.xcassets */; };
+		918FC5132DC49DA60007616C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 918FC4DB2DC49DA60007616C /* GoogleService-Info.plist */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		916895A82DC46FEE0097BA88 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +54,32 @@
 		916895992DC46FEC0097BA88 /* Rhythm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rhythm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		916895A72DC46FEE0097BA88 /* RhythmTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RhythmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		916895B12DC46FEE0097BA88 /* RhythmUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RhythmUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		918FC4D72DC49DA60007616C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		918FC4D82DC49DA60007616C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		918FC4D92DC49DA60007616C /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
+		918FC4DB2DC49DA60007616C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		918FC4DC2DC49DA60007616C /* TimerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerHelper.swift; sourceTree = "<group>"; };
+		918FC4DE2DC49DA60007616C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		918FC4DF2DC49DA60007616C /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		918FC4E12DC49DA60007616C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		918FC4E32DC49DA60007616C /* Rhythm.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Rhythm.entitlements; sourceTree = "<group>"; };
+		918FC4E42DC49DA60007616C /* Rhythm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Rhythm.xcodeproj; sourceTree = "<group>"; };
+		918FC4E52DC49DA60007616C /* RhythmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmApp.swift; sourceTree = "<group>"; };
+		918FC4E62DC49DA60007616C /* RhythmTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmTests.swift; sourceTree = "<group>"; };
+		918FC4E82DC49DA60007616C /* RhythmUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmUITests.swift; sourceTree = "<group>"; };
+		918FC4E92DC49DA60007616C /* RhythmUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		918FC4EB2DC49DA60007616C /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		918FC4EC2DC49DA60007616C /* PomodoroScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroScheduler.swift; sourceTree = "<group>"; };
+		918FC4ED2DC49DA60007616C /* TaskDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDataService.swift; sourceTree = "<group>"; };
+		918FC4EF2DC49DA60007616C /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		918FC4F02DC49DA60007616C /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
+		918FC4F12DC49DA60007616C /* TimerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewModel.swift; sourceTree = "<group>"; };
+		918FC4F32DC49DA60007616C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		918FC4F42DC49DA60007616C /* PomodoroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroView.swift; sourceTree = "<group>"; };
+		918FC4F52DC49DA60007616C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		918FC4F62DC49DA60007616C /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
+		918FC4F72DC49DA60007616C /* TaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListView.swift; sourceTree = "<group>"; };
+		918FC4F82DC49DA60007616C /* TimerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControlsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +128,21 @@
 		916895902DC46FEC0097BA88 = {
 			isa = PBXGroup;
 			children = (
+				918FC4D72DC49DA60007616C /* Assets.xcassets */,
+				918FC4D82DC49DA60007616C /* ContentView.swift */,
+				918FC4DA2DC49DA60007616C /* Extensions */,
+				918FC4DB2DC49DA60007616C /* GoogleService-Info.plist */,
+				918FC4DD2DC49DA60007616C /* Helpers */,
+				918FC4E02DC49DA60007616C /* Models */,
+				918FC4E22DC49DA60007616C /* Resources */,
+				918FC4E32DC49DA60007616C /* Rhythm.entitlements */,
+				918FC4E42DC49DA60007616C /* Rhythm.xcodeproj */,
+				918FC4E52DC49DA60007616C /* RhythmApp.swift */,
+				918FC4E72DC49DA60007616C /* RhythmTests */,
+				918FC4EA2DC49DA60007616C /* RhythmUITests */,
+				918FC4EE2DC49DA60007616C /* Services */,
+				918FC4F22DC49DA60007616C /* ViewModels */,
+				918FC4F92DC49DA60007616C /* Views */,
 				9168959B2DC46FEC0097BA88 /* Rhythm */,
 				916895AA2DC46FEE0097BA88 /* RhythmTests */,
 				916895B42DC46FEE0097BA88 /* RhythmUITests */,
@@ -89,6 +157,94 @@
 				916895A72DC46FEE0097BA88 /* RhythmTests.xctest */,
 				916895B12DC46FEE0097BA88 /* RhythmUITests.xctest */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		918FC4DA2DC49DA60007616C /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4D92DC49DA60007616C /* Date+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		918FC4DD2DC49DA60007616C /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4DC2DC49DA60007616C /* TimerHelper.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		918FC4E02DC49DA60007616C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4DE2DC49DA60007616C /* Session.swift */,
+				918FC4DF2DC49DA60007616C /* Task.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		918FC4E22DC49DA60007616C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4E12DC49DA60007616C /* Constants.swift */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		918FC4E72DC49DA60007616C /* RhythmTests */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4E62DC49DA60007616C /* RhythmTests.swift */,
+			);
+			path = RhythmTests;
+			sourceTree = "<group>";
+		};
+		918FC4EA2DC49DA60007616C /* RhythmUITests */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4E82DC49DA60007616C /* RhythmUITests.swift */,
+				918FC4E92DC49DA60007616C /* RhythmUITestsLaunchTests.swift */,
+			);
+			path = RhythmUITests;
+			sourceTree = "<group>";
+		};
+		918FC4EE2DC49DA60007616C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4EB2DC49DA60007616C /* NotificationService.swift */,
+				918FC4EC2DC49DA60007616C /* PomodoroScheduler.swift */,
+				918FC4ED2DC49DA60007616C /* TaskDataService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		918FC4F22DC49DA60007616C /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4EF2DC49DA60007616C /* SettingsViewModel.swift */,
+				918FC4F02DC49DA60007616C /* TaskViewModel.swift */,
+				918FC4F12DC49DA60007616C /* TimerViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		918FC4F92DC49DA60007616C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				918FC4F32DC49DA60007616C /* HomeView.swift */,
+				918FC4F42DC49DA60007616C /* PomodoroView.swift */,
+				918FC4F52DC49DA60007616C /* SettingsView.swift */,
+				918FC4F62DC49DA60007616C /* TaskDetailView.swift */,
+				918FC4F72DC49DA60007616C /* TaskListView.swift */,
+				918FC4F82DC49DA60007616C /* TimerControlsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		918FC4FA2DC49DA60007616C /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -198,6 +354,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9168959A2DC46FEC0097BA88 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 918FC4FA2DC49DA60007616C /* Products */;
+					ProjectRef = 918FC4E42DC49DA60007616C /* Rhythm.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				916895982DC46FEC0097BA88 /* Rhythm */,
@@ -212,6 +374,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				918FC5122DC49DA60007616C /* Assets.xcassets in Resources */,
+				918FC5132DC49DA60007616C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +400,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				918FC4FC2DC49DA60007616C /* TaskDetailView.swift in Sources */,
+				918FC4FD2DC49DA60007616C /* Session.swift in Sources */,
+				918FC4FE2DC49DA60007616C /* RhythmApp.swift in Sources */,
+				918FC4FF2DC49DA60007616C /* SettingsView.swift in Sources */,
+				918FC5002DC49DA60007616C /* PomodoroView.swift in Sources */,
+				918FC5012DC49DA60007616C /* RhythmTests.swift in Sources */,
+				918FC5022DC49DA60007616C /* Constants.swift in Sources */,
+				918FC5032DC49DA60007616C /* SettingsViewModel.swift in Sources */,
+				918FC5042DC49DA60007616C /* TaskDataService.swift in Sources */,
+				918FC5052DC49DA60007616C /* TaskViewModel.swift in Sources */,
+				918FC5062DC49DA60007616C /* NotificationService.swift in Sources */,
+				918FC5072DC49DA60007616C /* HomeView.swift in Sources */,
+				918FC5082DC49DA60007616C /* TaskListView.swift in Sources */,
+				918FC5092DC49DA60007616C /* TimerControlsView.swift in Sources */,
+				918FC50A2DC49DA60007616C /* RhythmUITestsLaunchTests.swift in Sources */,
+				918FC50B2DC49DA60007616C /* RhythmUITests.swift in Sources */,
+				918FC50C2DC49DA60007616C /* Task.swift in Sources */,
+				918FC50D2DC49DA60007616C /* ContentView.swift in Sources */,
+				918FC50E2DC49DA60007616C /* PomodoroScheduler.swift in Sources */,
+				918FC50F2DC49DA60007616C /* TimerHelper.swift in Sources */,
+				918FC5102DC49DA60007616C /* TimerViewModel.swift in Sources */,
+				918FC5112DC49DA60007616C /* Date+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,6 +577,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Rhythm/Rhythm.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VG3VPTDUH4;
@@ -430,6 +617,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Rhythm/Rhythm.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VG3VPTDUH4;
