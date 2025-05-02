@@ -31,7 +31,7 @@ struct TaskDetailView: View {
     }
     
     // For editing existing tasks
-    init(task: Task, taskService: TaskDataService) {
+    init(task: TodoTask, taskService: TaskDataService) {
         self.taskService = taskService
         self._title = State(initialValue: task.title)
         self._description = State(initialValue: task.description)
@@ -102,7 +102,7 @@ struct TaskDetailView: View {
     private func saveTask() async {
         isLoading = true
         
-        let task = Task(
+        let task = TodoTask(
             id: taskId,
             title: title,
             description: description,

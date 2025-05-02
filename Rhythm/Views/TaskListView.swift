@@ -82,7 +82,7 @@ struct TaskListView: View {
 }
 
 struct TaskRowView: View {
-    let task: Task
+    let task: TodoTask
     
     var body: some View {
         HStack {
