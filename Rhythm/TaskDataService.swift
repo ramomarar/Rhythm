@@ -1,6 +1,7 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import FirebaseAuth
 
 // MARK: - Task Model
 struct Task: Identifiable, Codable {
