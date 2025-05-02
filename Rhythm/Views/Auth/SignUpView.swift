@@ -50,7 +50,7 @@ struct SignUpView: View {
                 PrimaryButton(title: "Sign Up", action: {
                     Task {
                         do {
-                            try await authViewModel.createAccount(withEmail: email, password: password)
+                            try await authViewModel.createAccount(withEmail: email, password: password, name: name)
                             dismiss()
                         } catch {
                             // Error is already handled by the alert in the view

@@ -35,7 +35,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func createAccount(withEmail email: String, password: String) async throws {
+    func createAccount(withEmail email: String, password: String, name: String) async throws {
         isLoading = true
         error = nil
         
@@ -45,13 +45,20 @@ class AuthViewModel: ObservableObject {
         
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
-            isAuthenticated = true
+            
+            // Update the user's display name in Firebase Auth
+            let changeRequest = result.user.createProfileChangeRequest()
+            changeRequest.displayName = name
+            try await changeRequest.commitChanges()
             
             // Create user document in Firestore
             try await Firestore.firestore().collection("users").document(result.user.uid).setData([
                 "email": email,
+                "name": name,
                 "createdAt": Date()
             ])
+            
+            isAuthenticated = true
         } catch {
             self.error = error.localizedDescription
             throw error

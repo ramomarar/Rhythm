@@ -151,7 +151,23 @@ class HomeViewModel: ObservableObject {
     
     func loadUserData() {
         guard let user = Auth.auth().currentUser else { return }
-        displayName = user.displayName ?? "User"
+        
+        // Fetch user data from Firestore
+        Task { @MainActor in
+            do {
+                let document = try await db.collection("users").document(user.uid).getDocument()
+                if document.exists {
+                    let data = document.data()
+                    displayName = data?["name"] as? String ?? "User"
+                } else {
+                    displayName = user.displayName ?? "User"
+                }
+            } catch {
+                print("Error fetching user data: \(error.localizedDescription)")
+                displayName = user.displayName ?? "User"
+            }
+        }
+        
         // Simulate loading tasks (replace with Firestore fetch in real app)
         let now = Date()
         let tasks = [
