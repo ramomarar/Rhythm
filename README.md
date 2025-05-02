@@ -95,6 +95,9 @@ git commit -m "Add editable task view"
 git push origin feature/task-editor
 All code changes must go through a PR, reviewed by at least one team member.
 
+```
+
+
 📦 Submission Info
 Include this README.md and your GitHub repo URL in your final Canvas submission.
 
