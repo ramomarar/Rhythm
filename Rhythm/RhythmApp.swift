@@ -23,8 +23,13 @@ struct RhythmApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AuthLandingView()
-                .environmentObject(authViewModel)
+            if authViewModel.isAuthenticated {
+                HomeView()
+                    .environmentObject(authViewModel)
+            } else {
+                AuthLandingView()
+                    .environmentObject(authViewModel)
+            }
         }
     }
 }

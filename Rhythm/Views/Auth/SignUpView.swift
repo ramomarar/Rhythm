@@ -39,7 +39,12 @@ struct SignUpView: View {
             // Sign Up Button
             Button {
                 Task {
-                    try await authViewModel.createAccount(withEmail: email, password: password)
+                    do {
+                        try await authViewModel.createAccount(withEmail: email, password: password)
+                        dismiss()
+                    } catch {
+                        // Error is already handled by the alert in the view
+                    }
                 }
             } label: {
                 Text("Sign Up")
