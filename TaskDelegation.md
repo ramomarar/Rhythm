@@ -6,7 +6,7 @@
 **Responsibility:** Backend services, user authentication, data persistence
 
 **Tasks:**
-- [ ] Set up Firebase project and add iOS app
+- [X] Set up Firebase project and add iOS app
 - [ ] Install Firebase SDKs via Swift Package Manager
 - [ ] Configure `GoogleService-Info.plist` in Xcode
 - [ ] Implement Firebase **Email/Password Auth**
