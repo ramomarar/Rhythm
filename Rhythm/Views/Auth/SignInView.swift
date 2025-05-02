@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct SignInView: View {
-    @StateObject private var viewModel = AuthViewModel()
+    @EnvironmentObject private var authViewModel: AuthViewModel
+    @Environment(\.dismiss) var dismiss
     @State private var email = ""
     @State private var password = ""
-    @State private var showSignUp = false
     
     var body: some View {
         NavigationStack {
@@ -43,7 +43,7 @@ struct SignInView: View {
                 // Sign In Button
                 Button {
                     Task {
-                        try await viewModel.signIn(withEmail: email, password: password)
+                        try await authViewModel.signIn(withEmail: email, password: password)
                     }
                 } label: {
                     Text("Sign In")
@@ -54,8 +54,8 @@ struct SignInView: View {
                         .background(Color.blue)
                         .cornerRadius(10)
                 }
-                .disabled(viewModel.isLoading)
-                .opacity(viewModel.isLoading ? 0.5 : 1)
+                .disabled(authViewModel.isLoading)
+                .opacity(authViewModel.isLoading ? 0.5 : 1)
                 
                 // Sign in with providers
                 VStack(spacing: 16) {
@@ -103,17 +103,16 @@ struct SignInView: View {
             }
             .padding()
             .navigationBarBackButtonHidden()
-            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-                Button("OK") { viewModel.error = nil }
+            .alert("Error", isPresented: .constant(authViewModel.error != nil)) {
+                Button("OK") { authViewModel.error = nil }
             } message: {
-                Text(viewModel.error ?? "")
+                Text(authViewModel.error ?? "")
             }
         }
     }
 }
 
-struct SignInView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignInView()
-    }
+#Preview {
+    SignInView()
+        .environmentObject(AuthViewModel())
 } 

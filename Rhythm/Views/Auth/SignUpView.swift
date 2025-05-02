@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SignUpView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = AuthViewModel()
+    @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -39,7 +39,7 @@ struct SignUpView: View {
             // Sign Up Button
             Button {
                 Task {
-                    try await viewModel.createAccount(withEmail: email, password: password)
+                    try await authViewModel.createAccount(withEmail: email, password: password)
                 }
             } label: {
                 Text("Sign Up")
@@ -50,8 +50,8 @@ struct SignUpView: View {
                     .background(Color.blue)
                     .cornerRadius(10)
             }
-            .disabled(viewModel.isLoading)
-            .opacity(viewModel.isLoading ? 0.5 : 1)
+            .disabled(authViewModel.isLoading)
+            .opacity(authViewModel.isLoading ? 0.5 : 1)
             
             // Sign up with providers
             VStack(spacing: 16) {
@@ -74,7 +74,7 @@ struct SignUpView: View {
                     Button {
                         // Handle Google sign up
                     } label: {
-                        Image("google_logo") // You'll need to add this to assets
+                        Image("google_logo")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 24, height: 24)
@@ -111,18 +111,17 @@ struct SignUpView: View {
                 }
             }
         }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-            Button("OK") { viewModel.error = nil }
+        .alert("Error", isPresented: .constant(authViewModel.error != nil)) {
+            Button("OK") { authViewModel.error = nil }
         } message: {
-            Text(viewModel.error ?? "")
+            Text(authViewModel.error ?? "")
         }
     }
 }
 
-struct SignUpView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            SignUpView()
-        }
+#Preview {
+    NavigationStack {
+        SignUpView()
+            .environmentObject(AuthViewModel())
     }
 } 
