@@ -8,105 +8,101 @@ struct SignInView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                // Header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Welcome Back")
-                        .font(.title)
-                        .fontWeight(.bold)
+            ZStack {
+                Color.white.ignoresSafeArea()
+                VStack(spacing: 32) {
+                    // Decorative Dots
+                    HStack {
+                        Circle().fill(Color(hex: "#7B61FF").opacity(0.15)).frame(width: 10, height: 10)
+                        Spacer()
+                        Circle().fill(Color(hex: "#FFD36E").opacity(0.25)).frame(width: 8, height: 8)
+                    }.padding(.horizontal, 8)
                     
-                    Text("Please enter your email address\nand password for Login")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .lineSpacing(4)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top)
-                
-                // Form Fields
-                VStack(spacing: 16) {
-                    AuthTextField(placeholder: "Email", text: $email)
-                        .textContentType(.emailAddress)
-                        .autocapitalization(.none)
+                    // Header
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Sign In")
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#7B61FF"))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Welcome Back")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.black)
+                        Text("Please enter your email address\nand password for Login")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .lineSpacing(4)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top)
                     
-                    AuthTextField(placeholder: "Password", text: $password, isSecure: true)
-                        .textContentType(.password)
+                    // Form Fields
+                    VStack(spacing: 16) {
+                        AuthTextField(placeholder: "Email", text: $email)
+                            .textContentType(.emailAddress)
+                            .autocapitalization(.none)
+                        AuthTextField(placeholder: "Password", text: $password, isSecure: true)
+                            .textContentType(.password)
+                        Button("Forgot Password?") {
+                            // Handle forgot password
+                        }
+                        .font(.footnote)
+                        .foregroundColor(Color(hex: "#7B61FF"))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
                     
-                    Button("Forgot Password?") {
-                        // Handle forgot password
+                    // Sign In Button
+                    PrimaryButton(title: "Sign In", action: {
+                        Task {
+                            try? await authViewModel.signIn(withEmail: email, password: password)
+                        }
+                    }, isLoading: authViewModel.isLoading)
+                    
+                    // Sign in with providers
+                    VStack(spacing: 16) {
+                        Text("Sign in with")
+                            .foregroundColor(.gray)
+                        HStack(spacing: 20) {
+                            Button {
+                                // Handle Apple sign in
+                            } label: {
+                                Image(systemName: "apple.logo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24, height: 24)
+                                    .padding()
+                                    .background(Color(.systemGray6))
+                                    .clipShape(Circle())
+                            }
+                            Button {
+                                // Handle Google sign in
+                            } label: {
+                                Image("google_logo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24, height: 24)
+                                    .padding()
+                                    .background(Color(.systemGray6))
+                                    .clipShape(Circle())
+                            }
+                        }
+                    }
+                    Spacer()
+                    // Sign Up Link
+                    HStack {
+                        Text("Not Registered Yet?")
+                            .foregroundColor(.gray)
+                        NavigationLink("Sign Up", destination: SignUpView())
+                            .foregroundColor(Color(hex: "#7B61FF"))
                     }
                     .font(.footnote)
-                    .foregroundColor(.blue)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                
-                // Sign In Button
-                Button {
-                    Task {
-                        try await authViewModel.signIn(withEmail: email, password: password)
-                    }
-                } label: {
-                    Text("Sign In")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                .padding()
+                .navigationBarBackButtonHidden()
+                .alert("Error", isPresented: .constant(authViewModel.error != nil)) {
+                    Button("OK") { authViewModel.error = nil }
+                } message: {
+                    Text(authViewModel.error ?? "")
                 }
-                .disabled(authViewModel.isLoading)
-                .opacity(authViewModel.isLoading ? 0.5 : 1)
-                
-                // Sign in with providers
-                VStack(spacing: 16) {
-                    Text("Sign in with")
-                        .foregroundColor(.gray)
-                    
-                    HStack(spacing: 20) {
-                        Button {
-                            // Handle Apple sign in
-                        } label: {
-                            Image(systemName: "apple.logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24, height: 24)
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
-                        }
-                        
-                        Button {
-                            // Handle Google sign in
-                        } label: {
-                            Image("google_logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24, height: 24)
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
-                        }
-                    }
-                }
-                
-                Spacer()
-                
-                // Sign Up Link
-                HStack {
-                    Text("Not Registered Yet?")
-                        .foregroundColor(.gray)
-                    
-                    NavigationLink("Sign Up", destination: SignUpView())
-                        .foregroundColor(.blue)
-                }
-                .font(.footnote)
-            }
-            .padding()
-            .navigationBarBackButtonHidden()
-            .alert("Error", isPresented: .constant(authViewModel.error != nil)) {
-                Button("OK") { authViewModel.error = nil }
-            } message: {
-                Text(authViewModel.error ?? "")
             }
         }
     }

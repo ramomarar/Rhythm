@@ -15,24 +15,79 @@ struct HomeView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else {
-                    // User Info Section
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Welcome!")
-                            .font(.title)
-                            .bold()
-                        if let user = Auth.auth().currentUser {
-                            Text("Email: \(user.email ?? "No email")")
-                                .font(.subheadline)
+            ZStack {
+                Color.white.ignoresSafeArea()
+                VStack(spacing: 24) {
+                    // Decorative Dots
+                    HStack {
+                        Circle().fill(Color(hex: "#FFD36E").opacity(0.25)).frame(width: 12, height: 12)
+                        Spacer()
+                        Circle().fill(Color(hex: "#7B61FF").opacity(0.15)).frame(width: 10, height: 10)
+                    }.padding(.horizontal, 8)
+                    
+                    // Onboarding Image & Bubble
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: "#E5DEFF"))
+                            .frame(width: 180, height: 180)
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 120, height: 120)
+                            .foregroundColor(Color(hex: "#7B61FF"))
+                        // Example chat bubbles
+                        VStack {
+                            HStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white)
+                                    .frame(width: 90, height: 36)
+                                    .overlay(
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "person.2.fill").font(.caption)
+                                            Text("...").font(.caption)
+                                        }
+                                        .foregroundColor(Color(hex: "#7B61FF"))
+                                    )
+                                    .offset(x: -40, y: -40)
+                                Spacer()
+                            }
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white)
+                                    .frame(width: 110, height: 36)
+                                    .overlay(
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "bubble.left.fill").font(.caption)
+                                            Text("...").font(.caption)
+                                        }
+                                        .foregroundColor(Color(hex: "#7B61FF"))
+                                    )
+                                    .offset(x: 40, y: 40)
+                            }
                         }
+                        .frame(width: 180, height: 180)
                     }
-                    .padding()
+                    .padding(.top, 16)
+                    
+                    // Welcome Text
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Task Management")
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#7B61FF"))
+                        Text("Manage your ")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.black)
+                        + Text("Tasks")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(Color(hex: "#7B61FF"))
+                        + Text(" quickly for\nResults✌️")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.black)
+                    }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(10)
+                    .padding(.horizontal)
                     
                     // Example Data Section
                     if !viewModel.exampleData.isEmpty {
@@ -53,24 +108,45 @@ struct HomeView: View {
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.gray.opacity(0.1))
-                        .cornerRadius(10)
+                        .cornerRadius(16)
                     }
-                    
                     Spacer()
+                    // Bottom Navigation
+                    HStack {
+                        Button("Skip") {
+                            // Handle skip
+                        }
+                        .foregroundColor(.gray)
+                        Spacer()
+                        Button(action: {
+                            // Handle next/onboard
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#7B61FF"))
+                                    .frame(width: 48, height: 48)
+                                Image(systemName: "arrow.right")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 22, weight: .bold))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
                 }
-            }
-            .padding()
-            .navigationTitle("Home")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Logout") {
-                        viewModel.signOut()
+                .padding()
+                .navigationTitle("")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Logout") {
+                            viewModel.signOut()
+                        }
                     }
                 }
             }
-        }
-        .onAppear {
-            viewModel.loadUserData()
+            .onAppear {
+                viewModel.loadUserData()
+            }
         }
     }
 }
