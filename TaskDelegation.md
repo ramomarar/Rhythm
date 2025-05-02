@@ -7,8 +7,8 @@
 
 **Tasks:**
 - [X] Set up Firebase project and add iOS app
-- [ ] Install Firebase SDKs via Swift Package Manager
-- [ ] Configure `GoogleService-Info.plist` in Xcode
+- [X] Install Firebase SDKs via Swift Package Manager
+- [X] Configure `GoogleService-Info.plist` in Xcode
 - [ ] Implement Firebase **Email/Password Auth**
 - [ ] Create `UserSession` model & bind to SwiftUI state
 - [ ] Build `TaskDataService.swift` to read/write tasks (Firestore)
