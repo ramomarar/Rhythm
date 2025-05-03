@@ -48,14 +48,7 @@ struct SignUpView: View {
                 
                 // Sign Up Button
                 PrimaryButton(title: "Sign Up", action: {
-                    Task {
-                        do {
-                            try await authViewModel.createAccount(withEmail: email, password: password, name: name)
-                            dismiss()
-                        } catch {
-                            // Error is already handled by the alert in the view
-                        }
-                    }
+                    signUpUser()
                 }, isLoading: authViewModel.isLoading)
                 
                 // Sign up with providers
@@ -115,6 +108,19 @@ struct SignUpView: View {
                 Button("OK") { authViewModel.error = nil }
             } message: {
                 Text(authViewModel.error ?? "")
+            }
+        }
+    }
+    
+    private func signUpUser() {
+        _Concurrency.detach {
+            do {
+                try await self.authViewModel.createAccount(withEmail: self.email, password: self.password, name: self.name)
+                await MainActor.run {
+                    self.dismiss()
+                }
+            } catch {
+                // Error is already handled by the alert in the view
             }
         }
     }

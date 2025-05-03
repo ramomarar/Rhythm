@@ -25,7 +25,20 @@ struct TaskListView: View {
                                 TaskRowView(task: task)
                             }
                         }
-                        .onDelete(perform: deleteTasks)
+                        .onDelete { indexSet in
+                            Task {
+                                for index in indexSet {
+                                    let task = taskService.tasks[index]
+                                    if let id = task.id {
+                                        do {
+                                            try await taskService.deleteTask(id)
+                                        } catch {
+                                            errorMessage = error.localizedDescription
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     .refreshable {
                         await loadTasks()
@@ -66,7 +79,7 @@ struct TaskListView: View {
     }
     
     private func deleteTasks(at offsets: IndexSet) {
-        Swift.Task {
+        Task {
             for index in offsets {
                 let task = taskService.tasks[index]
                 if let id = task.id {

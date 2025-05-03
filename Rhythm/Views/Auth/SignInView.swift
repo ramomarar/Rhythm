@@ -52,9 +52,7 @@ struct SignInView: View {
                     
                     // Sign In Button
                     PrimaryButton(title: "Sign In", action: {
-                        Task {
-                            try? await authViewModel.signIn(withEmail: email, password: password)
-                        }
+                        signInUser()
                     }, isLoading: authViewModel.isLoading)
                     
                     // Sign in with providers
@@ -103,6 +101,17 @@ struct SignInView: View {
                 } message: {
                     Text(authViewModel.error ?? "")
                 }
+            }
+        }
+    }
+    
+    private func signInUser() {
+        // Create a detached task that won't cause conflicts
+        _Concurrency.detach {
+            do {
+                try await self.authViewModel.signIn(withEmail: self.email, password: self.password)
+            } catch {
+                // Error handling is managed by AuthViewModel
             }
         }
     }

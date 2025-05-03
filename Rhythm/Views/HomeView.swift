@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import Foundation
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
@@ -153,20 +154,7 @@ class HomeViewModel: ObservableObject {
         guard let user = Auth.auth().currentUser else { return }
         
         // Fetch user data from Firestore
-        Task { @MainActor in
-            do {
-                let document = try await db.collection("users").document(user.uid).getDocument()
-                if document.exists {
-                    let data = document.data()
-                    displayName = data?["name"] as? String ?? "User"
-                } else {
-                    displayName = user.displayName ?? "User"
-                }
-            } catch {
-                print("Error fetching user data: \(error.localizedDescription)")
-                displayName = user.displayName ?? "User"
-            }
-        }
+        fetchUserDataAsync(user: user)
         
         // Simulate loading tasks (replace with Firestore fetch in real app)
         let now = Date()
@@ -179,6 +167,54 @@ class HomeViewModel: ObservableObject {
         completedTasks = tasks.filter { $0.completed }.count
         upcomingTaskList = tasks.filter { !$0.completed }
         upcomingTasks = upcomingTaskList.count
+    }
+    
+    private func fetchUserDataAsync(user: FirebaseAuth.User) {
+        DispatchQueue.global().async {
+            let db = self.db
+            // Create a continuation to bridge between async/await and completion handlers
+            let document: DocumentSnapshot
+            do {
+                // Use URLSession synchronously as a workaround
+                let semaphore = DispatchSemaphore(value: 0)
+                var docResult: DocumentSnapshot?
+                var docError: Error?
+                
+                db.collection("users").document(user.uid).getDocument { snapshot, error in
+                    docResult = snapshot
+                    docError = error
+                    semaphore.signal()
+                }
+                
+                semaphore.wait()
+                
+                if let error = docError {
+                    throw error
+                }
+                
+                guard let document = docResult else {
+                    print("No document data")
+                    DispatchQueue.main.async {
+                        self.displayName = user.displayName ?? "User"
+                    }
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    if document.exists {
+                        let data = document.data()
+                        self.displayName = data?["name"] as? String ?? "User"
+                    } else {
+                        self.displayName = user.displayName ?? "User"
+                    }
+                }
+            } catch {
+                print("Error fetching user data: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.displayName = user.displayName ?? "User"
+                }
+            }
+        }
     }
     
     func signOut() {
