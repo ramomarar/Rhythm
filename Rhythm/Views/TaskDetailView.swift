@@ -56,9 +56,7 @@ struct TaskDetailView: View {
                 if isEditing {
                     Section {
                         Button(role: .destructive) {
-                            Task {
-                                await deleteTask()
-                            }
+                            performDeleteTask()
                         } label: {
                             HStack {
                                 Spacer()
@@ -79,9 +77,7 @@ struct TaskDetailView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        Task {
-                            await saveTask()
-                        }
+                        performSaveTask()
                     }
                     .disabled(title.isEmpty)
                 }
@@ -91,18 +87,22 @@ struct TaskDetailView: View {
                     ProgressView()
                 }
             }
-            .alert("Error", isPresented: .constant(errorMessage != nil)) {
-                Button("OK") { errorMessage = nil }
-            } message: {
-                Text(errorMessage ?? "")
+            .alert(isPresented: .constant(errorMessage != nil)) {
+                Alert(
+                    title: Text("Error"),
+                    message: Text(errorMessage ?? ""),
+                    dismissButton: .default(Text("OK")) {
+                        errorMessage = nil
+                    }
+                )
             }
         }
     }
     
-    private func saveTask() async {
+    private func performSaveTask() {
         isLoading = true
         
-        let task = TodoTask(
+        let taskToSave = TodoTask(
             id: taskId,
             title: title,
             description: description,
@@ -112,31 +112,47 @@ struct TaskDetailView: View {
             userId: ""
         )
         
-        do {
-            if isEditing {
-                try await taskService.updateTask(task)
-            } else {
-                try await taskService.createTask(task)
+        _Concurrency.detach {
+            do {
+                if self.isEditing {
+                    try await self.taskService.updateTask(taskToSave)
+                } else {
+                    try await self.taskService.createTask(taskToSave)
+                }
+                
+                await MainActor.run {
+                    self.isLoading = false
+                    self.dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
             }
-            dismiss()
-        } catch {
-            errorMessage = error.localizedDescription
         }
-        
-        isLoading = false
     }
     
-    private func deleteTask() async {
+    private func performDeleteTask() {
         guard let id = taskId else { return }
         
         isLoading = true
-        do {
-            try await taskService.deleteTask(id)
-            dismiss()
-        } catch {
-            errorMessage = error.localizedDescription
+        
+        _Concurrency.detach {
+            do {
+                try await self.taskService.deleteTask(id)
+                
+                await MainActor.run {
+                    self.isLoading = false
+                    self.dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
         }
-        isLoading = false
     }
 }
 

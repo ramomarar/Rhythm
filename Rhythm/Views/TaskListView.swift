@@ -26,18 +26,7 @@ struct TaskListView: View {
                             }
                         }
                         .onDelete { indexSet in
-                            Task {
-                                for index in indexSet {
-                                    let task = taskService.tasks[index]
-                                    if let id = task.id {
-                                        do {
-                                            try await taskService.deleteTask(id)
-                                        } catch {
-                                            errorMessage = error.localizedDescription
-                                        }
-                                    }
-                                }
-                            }
+                            deleteTasksAt(indexSet)
                         }
                     }
                     .refreshable {
@@ -56,10 +45,14 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 TaskDetailView(taskService: taskService)
             }
-            .alert("Error", isPresented: .constant(errorMessage != nil)) {
-                Button("OK") { errorMessage = nil }
-            } message: {
-                Text(errorMessage ?? "")
+            .alert(isPresented: .constant(errorMessage != nil)) {
+                Alert(
+                    title: Text("Error"),
+                    message: Text(errorMessage ?? ""),
+                    dismissButton: .default(Text("OK")) {
+                        errorMessage = nil
+                    }
+                )
             }
         }
         .task {
@@ -78,15 +71,17 @@ struct TaskListView: View {
         isLoading = false
     }
     
-    private func deleteTasks(at offsets: IndexSet) {
-        Task {
-            for index in offsets {
-                let task = taskService.tasks[index]
+    private func deleteTasksAt(_ indexSet: IndexSet) {
+        _Concurrency.detach {
+            for index in indexSet {
+                let task = self.taskService.tasks[index]
                 if let id = task.id {
                     do {
-                        try await taskService.deleteTask(id)
+                        try await self.taskService.deleteTask(id)
                     } catch {
-                        errorMessage = error.localizedDescription
+                        await MainActor.run {
+                            self.errorMessage = error.localizedDescription
+                        }
                     }
                 }
             }
