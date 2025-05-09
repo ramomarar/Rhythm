@@ -36,7 +36,8 @@ struct AuthLandingView: View {
     
     var body: some View {
         ZStack {
-            Color(.systemGray6).ignoresSafeArea()
+            Color.gray.opacity(0.2)
+
             VStack {
                 Spacer()
                 // Illustration

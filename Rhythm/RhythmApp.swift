@@ -6,19 +6,25 @@
 //
 
 import SwiftUI
+
+#if os(iOS)
 import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
-                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         FirebaseApp.configure()
         return true
     }
 }
+#endif
 
 @main
 struct RhythmApp: App {
+    #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    #endif
+    
     @StateObject private var authViewModel = AuthViewModel()
     
     var body: some Scene {

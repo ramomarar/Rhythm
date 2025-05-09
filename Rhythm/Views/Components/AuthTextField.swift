@@ -65,6 +65,6 @@ struct AuthTextField_Previews: PreviewProvider {
             AuthTextField(placeholder: "Secure Text Field", text: .constant(""), isSecure: true)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(.gray.opacity(0.2))
     }
 } 
