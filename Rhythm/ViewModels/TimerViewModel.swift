@@ -8,6 +8,8 @@ import Foundation
 import SwiftUI
 import Combine
 
+private var scheduler = PomodoroScheduler()
+
 class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int = 1500
     @Published var isTimerActive: Bool = false
