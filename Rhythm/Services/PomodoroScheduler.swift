@@ -7,18 +7,46 @@
 
 import Foundation
 import FirebaseAuth
+import Combine
 
 class PomodoroScheduler {
     private(set) var completedFocusSessions = 0
     private let sessionService = PomodoroSessionService()
+    private var cancellables = Set<AnyCancellable>()
     
-    //the configurablel session durations (in seconds so 25 * 60 is 25 mins etc )
-    let focusDuration: TimeInterval = 25 * 60
-    let shortBreakDuration: TimeInterval = 5 * 60
-    let longBreakDuration: TimeInterval = 15 * 60
-    let longBreakInterval = 4
+    // Default values that will be updated from settings
+    private var focusDuration: TimeInterval = 25 * 60
+    private var shortBreakDuration: TimeInterval = 5 * 60
+    private var longBreakDuration: TimeInterval = 15 * 60
+    private var longBreakInterval = 4
     
     private(set) var currentType: SessionType = .focus
+    
+    init() {
+        setupSettingsObserver()
+    }
+    
+    private func setupSettingsObserver() {
+        NotificationCenter.default.publisher(for: .pomodoroSettingsDidChange)
+            .sink { [weak self] notification in
+                guard let self = self,
+                      let userInfo = notification.userInfo else { return }
+                
+                if let focusDuration = userInfo["focusDuration"] as? Int {
+                    self.focusDuration = TimeInterval(focusDuration * 60)
+                }
+                if let shortBreakDuration = userInfo["shortBreakDuration"] as? Int {
+                    self.shortBreakDuration = TimeInterval(shortBreakDuration * 60)
+                }
+                if let longBreakDuration = userInfo["longBreakDuration"] as? Int {
+                    self.longBreakDuration = TimeInterval(longBreakDuration * 60)
+                }
+                if let longBreakInterval = userInfo["longBreakInterval"] as? Int {
+                    self.longBreakInterval = longBreakInterval
+                }
+            }
+            .store(in: &cancellables)
+    }
     
     func getNextSession(completion: @escaping (Session) -> Void) {
         let nextType: SessionType
