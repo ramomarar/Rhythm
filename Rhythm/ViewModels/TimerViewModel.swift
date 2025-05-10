@@ -20,6 +20,7 @@ class TimerViewModel: ObservableObject {
 
     private var timer: Timer?
     private var scheduler = PomodoroScheduler()
+    private var cancellables = Set<AnyCancellable>()
     
     var progress: CGFloat {
         return 1 - CGFloat(timeRemaining) / CGFloat(currentSession.duration)
@@ -48,7 +49,27 @@ class TimerViewModel: ObservableObject {
         self.currentSession = session
         self.timeRemaining = Int(session.duration)
         
+        setupSettingsObserver()
         loadData()
+    }
+    
+    private func setupSettingsObserver() {
+        NotificationCenter.default.publisher(for: .pomodoroSettingsDidChange)
+            .sink { [weak self] notification in
+                guard let self = self,
+                      let userInfo = notification.userInfo else { return }
+                
+                // Only update if timer is not active
+                if !self.isTimerActive {
+                    if let focusDuration = userInfo["focusDuration"] as? Int {
+                        if self.currentSession.type == .focus {
+                            self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
+                            self.timeRemaining = focusDuration * 60
+                        }
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func loadData() {
