@@ -17,12 +17,24 @@ struct Session: Identifiable, Codable {
     let type: SessionType
     let duration: TimeInterval
     let timestamp: Date
+    var userId: String?
+    var completed: Bool
     
     init(type: SessionType, duration: TimeInterval) {
         self.id = UUID()
         self.type = type
         self.duration = duration
         self.timestamp = Date()
+        self.completed = false
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case type
+        case duration
+        case timestamp
+        case userId
+        case completed
     }
 }
 

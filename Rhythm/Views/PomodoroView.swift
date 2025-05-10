@@ -1,4 +1,3 @@
-
 //
 //  PomodoroView.swift
 //  Rhythm
@@ -42,7 +41,7 @@ struct PomodoroView: View {
                 }
             }
 
-                        TimerControlsView(
+            TimerControlsView(
                 isTimerActive: viewModel.isTimerActive,
                 onStart: { viewModel.startTimer() },
                 onPause: { viewModel.pauseTimer() },
@@ -66,6 +65,11 @@ struct PomodoroView: View {
             default:
                 break
             }
+        }
+        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+            Button("OK") { viewModel.error = nil }
+        } message: {
+            Text(viewModel.error ?? "")
         }
     }
 }

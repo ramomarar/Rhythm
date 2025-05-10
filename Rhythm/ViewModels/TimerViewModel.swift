@@ -7,15 +7,16 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseAuth
 
-
-
+@MainActor
 class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int
     @Published var isTimerActive: Bool = false
     @Published var sessionsCompleted: Int = 0
     @Published var currentStreak: Int = 0
     @Published var currentSession: Session
+    @Published var error: String?
 
     private var timer: Timer?
     private var scheduler = PomodoroScheduler()
@@ -43,27 +44,51 @@ class TimerViewModel: ObservableObject {
     }
 
     init() {
-        let session = scheduler.nextSession()
+        let session = Session(type: .focus, duration: 25 * 60)
         self.currentSession = session
         self.timeRemaining = Int(session.duration)
+        
+        loadData()
+    }
+    
+    private func loadData() {
+        scheduler.fetchSessions { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self.scheduler.observeSessions()
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.error = error.localizedDescription
+                }
+            }
+        }
     }
 
     func startTimer() {
         guard !isTimerActive else { return }
         isTimerActive = true
-
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if self.timeRemaining > 0 {
-                self.timeRemaining -= 1
-            } else {
-                self.completeSession()
-            }
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.updateTimer()
+        }
+    }
+    
+    private func updateTimer() {
+        if timeRemaining > 0 {
+            timeRemaining -= 1
+        } else {
+            completeCurrentSession()
         }
     }
 
     func pauseTimer() {
         isTimerActive = false
         timer?.invalidate()
+        timer = nil
     }
 
     func resetTimer() {
@@ -72,20 +97,37 @@ class TimerViewModel: ObservableObject {
     }
 
     func skipToNext() {
-        completeSession()
+        completeCurrentSession()
     }
-
-    private func completeSession() {
+    
+    private func completeCurrentSession() {
         pauseTimer()
         sessionsCompleted += 1
         currentStreak += 1
-
-        let next = scheduler.nextSession()
-        currentSession = next
-        timeRemaining = Int(next.duration)
+        
+        var completedSession = currentSession
+        completedSession.completed = true
+        
+        getNextSession()
+    }
+    
+    private func getNextSession() {
+        scheduler.getNextSession { [weak self] nextSession in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.currentSession = nextSession
+                self.timeRemaining = Int(nextSession.duration)
+            }
+        }
     }
 
-    func handleForegroundTransition() {}
+    func handleForegroundTransition() {
+        if isTimerActive {
+            startTimer()
+        }
+    }
+    
     func handleBackgroundTransition() {
         pauseTimer()
     }

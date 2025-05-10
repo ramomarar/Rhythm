@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 class PomodoroScheduler {
     private(set) var completedFocusSessions = 0
+    private let sessionService = PomodoroSessionService()
     
     //the configurablel session durations (in seconds so 25 * 60 is 25 mins etc )
     let focusDuration: TimeInterval = 25 * 60
@@ -18,7 +20,7 @@ class PomodoroScheduler {
     
     private(set) var currentType: SessionType = .focus
     
-    func nextSession() -> Session {
+    func getNextSession(completion: @escaping (Session) -> Void) {
         let nextType: SessionType
         
         switch currentType {
@@ -38,12 +40,28 @@ class PomodoroScheduler {
         case .longBreak: duration = longBreakDuration
         }
         
-        return Session(type: nextType, duration: duration)
+        let session = Session(type: nextType, duration: duration)
+        
+        if let userId = Auth.auth().currentUser?.uid {
+            var sessionWithUser = session
+            sessionWithUser.userId = userId
+            sessionService.saveSession(sessionWithUser) { _ in
+                // Ignore result, just complete with the session
+                completion(session)
+            }
+        } else {
+            completion(session)
+        }
     }
     
+    func fetchSessions(completion: @escaping (Result<Void, Error>) -> Void) {
+        sessionService.fetchSessions { result in
+            completion(result)
+        }
+    }
     
-    
-    
-    
+    func observeSessions() {
+        sessionService.observeSessions()
+    }
 }
 
