@@ -17,7 +17,7 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(.systemGray6).ignoresSafeArea()
+                Color(.gray.opacity(0.2)).ignoresSafeArea()
                 VStack(alignment: .leading, spacing: 24) {
                     // Greeting
                     VStack(alignment: .leading, spacing: 4) {
@@ -92,7 +92,7 @@ struct HomeView: View {
                 }
                 .navigationTitle("")
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItem(placement: .automatic) {
                         Button("Logout") {
                             viewModel.signOut()
                         }
