@@ -51,33 +51,26 @@ struct SignUpView: View {
                     signUpUser()
                 }, isLoading: authViewModel.isLoading)
                 
-                // Sign up with providers
+                // Sign up with Google
                 VStack(spacing: 16) {
                     Text("Sign up with")
                         .foregroundColor(.gray)
-                    HStack(spacing: 20) {
-                        Button {
-                            // Handle Apple sign up
-                        } label: {
-                            Image(systemName: "apple.logo")
+                    Button {
+                        signInWithGoogle()
+                    } label: {
+                        HStack {
+                            Image(systemName: "g.circle.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 24, height: 24)
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
+                            Text("Continue with Google")
+                                .fontWeight(.semibold)
                         }
-                        Button {
-                            // Handle Google sign up
-                        } label: {
-                            Image("google_logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24, height: 24)
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
-                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(12)
                     }
                 }
                 Spacer()
@@ -121,6 +114,19 @@ struct SignUpView: View {
                 }
             } catch {
                 // Error is already handled by the alert in the view
+            }
+        }
+    }
+    
+    private func signInWithGoogle() {
+        _Concurrency.detach {
+            do {
+                try await self.authViewModel.signInWithGoogle()
+                await MainActor.run {
+                    self.dismiss()
+                }
+            } catch {
+                // Error handling is managed by AuthViewModel
             }
         }
     }
