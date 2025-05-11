@@ -18,121 +18,154 @@ struct HomeView: View {
         NavigationView {
             ZStack {
                 Color(.gray.opacity(0.2)).ignoresSafeArea()
-                VStack(alignment: .leading, spacing: 24) {
-                    // Greeting
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Welcome back,")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Text(viewModel.displayName)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color(hex: "#7B61FF"))
-                    }
-                    .padding(.top, 16)
-                    .padding(.horizontal)
-                    
-                    // Quick Stats Card
-                    HStack(spacing: 16) {
-                        DashboardStatCard(title: "Tasks", value: "\(viewModel.totalTasks)", icon: "checklist")
-                        DashboardStatCard(title: "Completed", value: "\(viewModel.completedTasks)", icon: "checkmark.circle.fill")
-                        DashboardStatCard(title: "Upcoming", value: "\(viewModel.upcomingTasks)", icon: "clock.fill")
-                    }
-                    .padding(.horizontal)
-                    
-                    // Recent/Upcoming Tasks
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Upcoming Tasks")
-                            .font(.headline)
-                        if viewModel.upcomingTaskList.isEmpty {
-                            Text("No upcoming tasks. Enjoy your day!")
-                                .foregroundColor(.gray)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Greeting
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Welcome back,")
                                 .font(.subheadline)
-                        } else {
-                            ForEach(viewModel.upcomingTaskList.prefix(3), id: \.self) { task in
-                                HStack {
-                                    Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                                        .foregroundColor(task.completed ? .green : .gray)
-                                    Text(task.title)
-                                        .fontWeight(.medium)
-                                    Spacer()
-                                    Text(task.dueDateString)
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
+                                .foregroundColor(.gray)
+                            Text(viewModel.displayName)
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(Color(hex: "#7B61FF"))
+                        }
+                        .padding(.top, 16)
+                        .padding(.horizontal)
+                        
+                        // Stats Grid
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 16) {
+                            // Total Tasks
+                            DashboardStatCard(
+                                title: "Total Tasks",
+                                value: "\(viewModel.totalTasks)",
+                                icon: "checklist",
+                                color: Color(hex: "#7B61FF")
+                            )
+                            
+                            // Completed This Week
+                            DashboardStatCard(
+                                title: "Completed",
+                                value: "\(viewModel.completedTasks)",
+                                icon: "checkmark.circle.fill",
+                                color: .green
+                            )
+                            
+                            // Yet to Complete
+                            DashboardStatCard(
+                                title: "To Do",
+                                value: "\(viewModel.upcomingTasks)",
+                                icon: "clock.fill",
+                                color: .orange
+                            )
+                            
+                            // Study Time
+                            DashboardStatCard(
+                                title: "Study Time",
+                                value: "\(viewModel.totalStudyTime)m",
+                                icon: "timer",
+                                color: .blue
+                            )
+                        }
+                        .padding(.horizontal)
+                        
+                        // Recent/Upcoming Tasks
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Upcoming Tasks")
+                                .font(.headline)
+                            if viewModel.upcomingTaskList.isEmpty {
+                                Text("No upcoming tasks. Enjoy your day!")
+                                    .foregroundColor(.gray)
+                                    .font(.subheadline)
+                            } else {
+                                ForEach(viewModel.upcomingTaskList.prefix(3), id: \.self) { task in
+                                    HStack {
+                                        Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(task.completed ? .green : .gray)
+                                        Text(task.title)
+                                            .fontWeight(.medium)
+                                        Spacer()
+                                        Text(task.dueDateString)
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.vertical, 6)
                                 }
-                                .padding(.vertical, 6)
                             }
                         }
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
-                    .padding(.horizontal)
-                    
-                    // TEMPORARY SECTION - Chloe's Timer Features for Testing
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Timer Features Testing")
-                            .font(.headline)
-                            .foregroundColor(.orange)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+                        .padding(.horizontal)
                         
-                        NavigationLink(destination: PomodoroView()) {
-                            HStack {
-                                Image(systemName: "timer")
-                                    .foregroundColor(.white)
-                                Text("Open Pomodoro Timer")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
+                        // TEMPORARY SECTION - Chloe's Timer Features for Testing
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Timer Features Testing")
+                                .font(.headline)
+                                .foregroundColor(.orange)
+                            
+                            NavigationLink(destination: PomodoroView()) {
+                                HStack {
+                                    Image(systemName: "timer")
+                                        .foregroundColor(.white)
+                                    Text("Open Pomodoro Timer")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .cornerRadius(12)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .cornerRadius(12)
-                        }
-                        
-                        NavigationLink(destination: SettingsView()) {
-                            HStack {
-                                Image(systemName: "gear")
-                                    .foregroundColor(.white)
-                                Text("Timer Settings")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
+                            
+                            NavigationLink(destination: SettingsView()) {
+                                HStack {
+                                    Image(systemName: "gear")
+                                        .foregroundColor(.white)
+                                    Text("Timer Settings")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .cornerRadius(12)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(12)
+                            
+                            Text("Note: This section is temporary for testing")
+                                .font(.caption)
+                                .foregroundColor(.gray)
                         }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+                        .padding(.horizontal)
                         
-                        Text("Note: This section is temporary for testing")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                    // Add Task Button
-                    HStack {
                         Spacer()
-                        Button(action: {
-                            // TODO: Present add task view
-                        }) {
-                            HStack {
-                                Image(systemName: "plus")
-                                Text("Add Task")
-                                    .fontWeight(.semibold)
+                        // Add Task Button
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                // TODO: Present add task view
+                            }) {
+                                HStack {
+                                    Image(systemName: "plus")
+                                    Text("Add Task")
+                                        .fontWeight(.semibold)
+                                }
+                                .padding()
+                                .background(Color(hex: "#7B61FF"))
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
                             }
-                            .padding()
-                            .background(Color(hex: "#7B61FF"))
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
+                            Spacer()
                         }
-                        Spacer()
+                        .padding(.bottom, 24)
                     }
-                    .padding(.bottom, 24)
                 }
                 .navigationTitle("")
                 .toolbar {
@@ -154,19 +187,22 @@ struct DashboardStatCard: View {
     let title: String
     let value: String
     let icon: String
+    let color: Color
+    
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(Color(hex: "#7B61FF"))
+                .foregroundColor(color)
             Text(value)
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
             Text(title)
                 .font(.caption)
                 .foregroundColor(.gray)
         }
-        .frame(width: 90, height: 90)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
         .background(Color.white)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
@@ -190,6 +226,7 @@ class HomeViewModel: ObservableObject {
     @Published var totalTasks: Int = 0
     @Published var completedTasks: Int = 0
     @Published var upcomingTasks: Int = 0
+    @Published var totalStudyTime: Int = 0
     @Published var upcomingTaskList: [DashboardTask] = []
     
     private let db = Firestore.firestore()
@@ -200,17 +237,63 @@ class HomeViewModel: ObservableObject {
         // Fetch user data from Firestore
         fetchUserDataAsync(user: user)
         
-        // Simulate loading tasks (replace with Firestore fetch in real app)
-        let now = Date()
-        let tasks = [
-            DashboardTask(title: "Finish onboarding UI", completed: false, dueDate: now.addingTimeInterval(3600)),
-            DashboardTask(title: "Review dashboard design", completed: false, dueDate: now.addingTimeInterval(7200)),
-            DashboardTask(title: "Submit assignment", completed: true, dueDate: now.addingTimeInterval(-3600)),
-        ]
-        totalTasks = tasks.count
-        completedTasks = tasks.filter { $0.completed }.count
-        upcomingTaskList = tasks.filter { !$0.completed }
-        upcomingTasks = upcomingTaskList.count
+        // Load tasks from Firestore
+        loadTasks()
+        
+        // Load pomodoro sessions
+        loadPomodoroSessions()
+    }
+    
+    private func loadTasks() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        db.collection("tasks")
+            .whereField("userId", isEqualTo: userId)
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self,
+                      let documents = snapshot?.documents else { return }
+                
+                let tasks = documents.compactMap { document -> DashboardTask? in
+                    let data = document.data()
+                    guard let title = data["title"] as? String,
+                          let completed = data["isCompleted"] as? Bool else { return nil }
+                    
+                    let timestamp = data["createdAt"] as? Timestamp
+                    let dueDate = timestamp?.dateValue()
+                    
+                    return DashboardTask(title: title, completed: completed, dueDate: dueDate)
+                }
+                
+                DispatchQueue.main.async {
+                    self.totalTasks = tasks.count
+                    self.completedTasks = tasks.filter { $0.completed }.count
+                    self.upcomingTaskList = tasks.filter { !$0.completed }
+                    self.upcomingTasks = self.upcomingTaskList.count
+                }
+            }
+    }
+    
+    private func loadPomodoroSessions() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        db.collection("pomodoro_sessions")
+            .whereField("userId", isEqualTo: userId)
+            .whereField("completed", isEqualTo: true)
+            .whereField("type", isEqualTo: "focus")
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self,
+                      let documents = snapshot?.documents else { return }
+                
+                let totalMinutes = documents.reduce(0) { sum, document in
+                    let data = document.data()
+                    let duration = data["duration"] as? TimeInterval ?? 0
+                    return sum + Int(duration / 60)
+                }
+                
+                DispatchQueue.main.async {
+                    self.totalStudyTime = totalMinutes
+                }
+            }
     }
     
     private func fetchUserDataAsync(user: FirebaseAuth.User) {

@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseAuth
 import Combine
+import FirebaseFirestore
 
 class PomodoroScheduler {
     private(set) var completedFocusSessions = 0
@@ -15,15 +16,38 @@ class PomodoroScheduler {
     private var cancellables = Set<AnyCancellable>()
     
     // Default values that will be updated from settings
-    private var focusDuration: TimeInterval = 25 * 60
-    private var shortBreakDuration: TimeInterval = 5 * 60
-    private var longBreakDuration: TimeInterval = 15 * 60
-    private var longBreakInterval = 4
+    private(set) var focusDuration: TimeInterval = 25 * 60
+    private(set) var shortBreakDuration: TimeInterval = 5 * 60
+    private(set) var longBreakDuration: TimeInterval = 15 * 60
+    private(set) var longBreakInterval = 4
     
     private(set) var currentType: SessionType = .focus
     
     init() {
         setupSettingsObserver()
+        loadInitialSettings()
+    }
+    
+    private func loadInitialSettings() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        Firestore.firestore().collection("pomodoro_settings").document(userId).getDocument { [weak self] snapshot, error in
+            guard let self = self,
+                  let data = snapshot?.data() else { return }
+            
+            if let focusDuration = data["focusDuration"] as? Int {
+                self.focusDuration = TimeInterval(focusDuration * 60)
+            }
+            if let shortBreakDuration = data["shortBreakDuration"] as? Int {
+                self.shortBreakDuration = TimeInterval(shortBreakDuration * 60)
+            }
+            if let longBreakDuration = data["longBreakDuration"] as? Int {
+                self.longBreakDuration = TimeInterval(longBreakDuration * 60)
+            }
+            if let longBreakInterval = data["longBreakInterval"] as? Int {
+                self.longBreakInterval = longBreakInterval
+            }
+        }
     }
     
     private func setupSettingsObserver() {

@@ -8,6 +8,7 @@ import Foundation
 import SwiftUI
 import Combine
 import FirebaseAuth
+import FirebaseFirestore
 
 @MainActor
 class TimerViewModel: ObservableObject {
@@ -45,12 +46,24 @@ class TimerViewModel: ObservableObject {
     }
 
     init() {
-        let session = Session(type: .focus, duration: 25 * 60)
-        self.currentSession = session
-        self.timeRemaining = Int(session.duration)
+        // Initialize with temporary values that will be updated
+        self.currentSession = Session(type: .focus, duration: 25 * 60)
+        self.timeRemaining = 25 * 60
         
         setupSettingsObserver()
         loadData()
+        
+        // Load initial settings
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        Firestore.firestore().collection("pomodoro_settings").document(userId).getDocument { [weak self] snapshot, error in
+            guard let self = self,
+                  let data = snapshot?.data() else { return }
+            
+            let focusDuration = data["focusDuration"] as? Int ?? 25
+            self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
+            self.timeRemaining = focusDuration * 60
+        }
     }
     
     private func setupSettingsObserver() {
@@ -59,14 +72,36 @@ class TimerViewModel: ObservableObject {
                 guard let self = self,
                       let userInfo = notification.userInfo else { return }
                 
-                // Only update if timer is not active
-                if !self.isTimerActive {
+                // Store current timer state
+                let wasActive = self.isTimerActive
+                
+                // Pause timer if it's running
+                if wasActive {
+                    self.pauseTimer()
+                }
+                
+                // Update session duration based on current type
+                switch self.currentSession.type {
+                case .focus:
                     if let focusDuration = userInfo["focusDuration"] as? Int {
-                        if self.currentSession.type == .focus {
-                            self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
-                            self.timeRemaining = focusDuration * 60
-                        }
+                        self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
+                        self.timeRemaining = focusDuration * 60
                     }
+                case .shortBreak:
+                    if let shortBreakDuration = userInfo["shortBreakDuration"] as? Int {
+                        self.currentSession = Session(type: .shortBreak, duration: TimeInterval(shortBreakDuration * 60))
+                        self.timeRemaining = shortBreakDuration * 60
+                    }
+                case .longBreak:
+                    if let longBreakDuration = userInfo["longBreakDuration"] as? Int {
+                        self.currentSession = Session(type: .longBreak, duration: TimeInterval(longBreakDuration * 60))
+                        self.timeRemaining = longBreakDuration * 60
+                    }
+                }
+                
+                // Restart timer if it was running
+                if wasActive {
+                    self.startTimer()
                 }
             }
             .store(in: &cancellables)
