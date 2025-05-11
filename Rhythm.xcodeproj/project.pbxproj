@@ -18,9 +18,22 @@
 		91AC7D392DC4A49100566FE9 /* Rhythm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rhythm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		910DC3342DD02AC000895A71 /* Exceptions for "Rhythm" folder in "Rhythm" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 91AC7D382DC4A49100566FE9 /* Rhythm */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		91AC7D3B2DC4A49100566FE9 /* Rhythm */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				910DC3342DD02AC000895A71 /* Exceptions for "Rhythm" folder in "Rhythm" target */,
+			);
 			path = Rhythm;
 			sourceTree = "<group>";
 		};
