@@ -30,6 +30,11 @@ struct PomodoroView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
+                    Text(task.description)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                     Text("Estimated \(task.estimatedSessions) session\(task.estimatedSessions == 1 ? "" : "s")")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -106,13 +111,10 @@ struct PomodoroView: View {
         }
         .padding()
         .onChange(of: scenePhase) { newPhase in
-            switch newPhase {
-            case .active:
-                viewModel.handleForegroundTransition()
-            case .background:
-                viewModel.handleBackgroundTransition()
-            default:
-                break
+            if newPhase == .active {
+                viewModel.resumeTimer()
+            } else if newPhase == .inactive {
+                viewModel.pauseTimer()
             }
         }
         .alert("Error", isPresented: Binding(

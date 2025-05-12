@@ -42,7 +42,8 @@ struct HomeView: View {
                                 title: "Total Tasks",
                                 value: "\(viewModel.totalTasks)",
                                 icon: "checklist",
-                                color: Color(hex: "#7B61FF")
+                                color: Color(hex: "#7B61FF"),
+                                filter: .all
                             )
                             
                             // Completed This Week
@@ -50,7 +51,8 @@ struct HomeView: View {
                                 title: "Completed",
                                 value: "\(viewModel.completedTasks)",
                                 icon: "checkmark.circle.fill",
-                                color: .green
+                                color: .green,
+                                filter: .completed
                             )
                             
                             // Yet to Complete
@@ -58,7 +60,8 @@ struct HomeView: View {
                                 title: "To Do",
                                 value: "\(viewModel.upcomingTasks)",
                                 icon: "clock.fill",
-                                color: .orange
+                                color: .orange,
+                                filter: .active
                             )
                             
                             // Study Time
@@ -66,7 +69,8 @@ struct HomeView: View {
                                 title: "Study Time",
                                 value: "\(viewModel.totalStudyTime)m",
                                 icon: "timer",
-                                color: .blue
+                                color: .blue,
+                                filter: nil
                             )
                         }
                         .padding(.horizontal)
@@ -81,17 +85,23 @@ struct HomeView: View {
                                     .font(.subheadline)
                             } else {
                                 ForEach(viewModel.upcomingTaskList.prefix(3), id: \.self) { task in
-                                    HStack {
-                                        Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(task.completed ? .green : .gray)
-                                        Text(task.title)
-                                            .fontWeight(.medium)
-                                        Spacer()
-                                        Text(task.dueDateString)
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
+                                    Button(action: {
+                                        viewModel.toggleTaskCompletion(task)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(task.completed ? .green : .gray)
+                                            Text(task.title)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.primary)
+                                            Spacer()
+                                            Text(task.dueDateString)
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                        .padding(.vertical, 6)
                                     }
-                                    .padding(.vertical, 6)
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                         }
@@ -191,24 +201,28 @@ struct DashboardStatCard: View {
     let value: String
     let icon: String
     let color: Color
+    let filter: TaskFilter?
     
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.gray)
+        NavigationLink(destination: TaskListView(initialFilter: filter)) {
+            VStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(color)
+                Text(value)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -353,6 +367,45 @@ class HomeViewModel: ObservableObject {
         } catch {
             print("Error signing out: \(error.localizedDescription)")
         }
+    }
+    
+    func toggleTaskCompletion(_ task: DashboardTask) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        // Find the task document
+        db.collection("tasks")
+            .whereField("userId", isEqualTo: userId)
+            .whereField("title", isEqualTo: task.title)
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self,
+                      let document = snapshot?.documents.first else { return }
+                
+                // Toggle completion status
+                let newStatus = !task.completed
+                document.reference.updateData([
+                    "isCompleted": newStatus
+                ]) { error in
+                    if error == nil {
+                        // Update local state
+                        DispatchQueue.main.async {
+                            if let index = self.upcomingTaskList.firstIndex(where: { $0.title == task.title }) {
+                                self.upcomingTaskList[index] = DashboardTask(
+                                    title: task.title,
+                                    completed: newStatus,
+                                    dueDate: task.dueDate
+                                )
+                                self.updateTaskCounts()
+                            }
+                        }
+                    }
+                }
+            }
+    }
+    
+    private func updateTaskCounts() {
+        totalTasks = upcomingTaskList.count
+        completedTasks = upcomingTaskList.filter { $0.completed }.count
+        upcomingTasks = upcomingTaskList.filter { !$0.completed }.count
     }
 }
 

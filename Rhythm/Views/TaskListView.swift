@@ -20,9 +20,14 @@ struct TaskListView: View {
     @State private var showingAddTask = false
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var selectedFilter: TaskFilter = .all
+    @State private var selectedFilter: TaskFilter
     @State private var showingPomodoro = false
     @State private var selectedTask: TodoTask?
+    @State private var showingTaskDetail = false
+    
+    init(initialFilter: TaskFilter? = nil) {
+        _selectedFilter = State(initialValue: initialFilter ?? .all)
+    }
     
     var filteredTasks: [TodoTask] {
         let tasks = taskService.tasks
@@ -79,6 +84,7 @@ struct TaskListView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     selectedTask = task
+                                    showingTaskDetail = true
                                 }
                         }
                         .onDelete { indexSet in
@@ -103,12 +109,9 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 TaskDetailView(taskService: taskService)
             }
-            .sheet(item: $selectedTask) { task in
-                TaskDetailView(task: task, taskService: taskService)
-            }
-            .sheet(isPresented: $showingPomodoro) {
+            .sheet(isPresented: $showingTaskDetail) {
                 if let task = selectedTask {
-                    PomodoroView(task: task)
+                    TaskDetailSheet(task: task, taskService: taskService)
                 }
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
@@ -197,6 +200,109 @@ struct TaskRowView: View {
         .padding(.vertical, 4)
         .sheet(isPresented: $showingPomodoro) {
             PomodoroView(task: task)
+        }
+    }
+}
+
+struct TaskDetailSheet: View {
+    let task: TodoTask
+    let taskService: TaskDataService
+    @State private var showingEditSheet = false
+    @State private var showingPomodoro = false
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Title and Description
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(task.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Text(task.description)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal)
+                    
+                    // Task Details
+                    VStack(alignment: .leading, spacing: 16) {
+                        DetailRow(icon: "clock", title: "Estimated Time", value: task.formattedEstimatedTime)
+                        if let dueDate = task.dueDate {
+                            DetailRow(icon: "calendar", title: "Due Date", value: task.formattedDueDate)
+                        }
+                        DetailRow(icon: "checkmark.circle", title: "Status", value: task.isCompleted ? "Completed" : "Active")
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    
+                    // Action Buttons
+                    VStack(spacing: 12) {
+                        Button(action: { showingPomodoro = true }) {
+                            HStack {
+                                Image(systemName: "timer")
+                                Text("Start Pomodoro Session")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(hex: "#7B61FF"))
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                        }
+                        
+                        Button(action: { showingEditSheet = true }) {
+                            HStack {
+                                Image(systemName: "pencil")
+                                Text("Edit Task")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(.systemGray5))
+                            .foregroundColor(.primary)
+                            .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .navigationTitle("Task Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingEditSheet) {
+                TaskDetailView(task: task, taskService: taskService)
+            }
+            .sheet(isPresented: $showingPomodoro) {
+                PomodoroView(task: task)
+            }
+        }
+    }
+}
+
+struct DetailRow: View {
+    let icon: String
+    let title: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .frame(width: 24)
+            Text(title)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+                .fontWeight(.medium)
         }
     }
 }
