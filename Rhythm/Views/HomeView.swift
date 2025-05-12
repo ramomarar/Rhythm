@@ -149,9 +149,7 @@ struct HomeView: View {
                         // Add Task Button
                         HStack {
                             Spacer()
-                            Button(action: {
-                                // TODO: Present add task view
-                            }) {
+                            NavigationLink(destination: TaskListView()) {
                                 HStack {
                                     Image(systemName: "plus")
                                     Text("Add Task")
@@ -169,6 +167,11 @@ struct HomeView: View {
                 }
                 .navigationTitle("")
                 .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: "gear")
+                        }
+                    }
                     ToolbarItem(placement: .automatic) {
                         Button("Logout") {
                             viewModel.signOut()
