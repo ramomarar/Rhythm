@@ -113,9 +113,9 @@ struct PomodoroView: View {
         .onChange(of: scenePhase) { phase in
             switch phase {
             case .active:
-                viewModel.resumeTimer()
+                viewModel.handleForegroundTransition()
             case .inactive:
-                viewModel.pauseTimer()
+                viewModel.handleBackgroundTransition()
             default:
                 break
             }
