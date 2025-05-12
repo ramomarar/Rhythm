@@ -7,14 +7,20 @@
 
 import SwiftUI
 
+// Import the Task model
+@_exported import struct Rhythm.TodoTask
+
 struct TaskDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var taskService: TaskDataService
     
-    @State private var title: String
-    @State private var description: String
-    @State private var isCompleted: Bool
-    @State private var isLoading = false
+    @State private var title: String = ""
+    @State private var description: String = ""
+    @State private var estimatedMinutes: Int = 25
+    @State private var dueDate: Date = Date()
+    @State private var hasDueDate: Bool = false
+    @State private var isCompleted: Bool = false
+    @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     
     private var isEditing: Bool
@@ -23,9 +29,6 @@ struct TaskDetailView: View {
     // For creating new tasks
     init(taskService: TaskDataService) {
         self.taskService = taskService
-        self._title = State(initialValue: "")
-        self._description = State(initialValue: "")
-        self._isCompleted = State(initialValue: false)
         self.isEditing = false
         self.taskId = nil
     }
@@ -35,6 +38,9 @@ struct TaskDetailView: View {
         self.taskService = taskService
         self._title = State(initialValue: task.title)
         self._description = State(initialValue: task.description)
+        self._estimatedMinutes = State(initialValue: task.estimatedMinutes)
+        self._dueDate = State(initialValue: task.dueDate ?? Date())
+        self._hasDueDate = State(initialValue: task.dueDate != nil)
         self._isCompleted = State(initialValue: task.isCompleted)
         self.isEditing = true
         self.taskId = task.id
@@ -47,6 +53,24 @@ struct TaskDetailView: View {
                     TextField("Title", text: $title)
                     TextEditor(text: $description)
                         .frame(height: 100)
+                }
+                
+                Section(header: Text("Time Estimate")) {
+                    Stepper("\(estimatedMinutes) minutes", value: $estimatedMinutes, in: 5...480, step: 5)
+                    
+                    if estimatedMinutes > 0 {
+                        let sessions = Int(ceil(Double(estimatedMinutes) / Double(UserDefaults.standard.integer(forKey: "focusDuration") > 0 ? UserDefaults.standard.integer(forKey: "focusDuration") : 25)))
+                        Text("Estimated \(sessions) focus session\(sessions == 1 ? "" : "s")")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Section(header: Text("Due Date")) {
+                    Toggle("Set Due Date", isOn: $hasDueDate)
+                    if hasDueDate {
+                        DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                    }
                 }
                 
                 Section {
@@ -87,14 +111,10 @@ struct TaskDetailView: View {
                     ProgressView()
                 }
             }
-            .alert(isPresented: .constant(errorMessage != nil)) {
-                Alert(
-                    title: Text("Error"),
-                    message: Text(errorMessage ?? ""),
-                    dismissButton: .default(Text("OK")) {
-                        errorMessage = nil
-                    }
-                )
+            .alert("Error", isPresented: .constant(errorMessage != nil)) {
+                Button("OK") { errorMessage = nil }
+            } message: {
+                Text(errorMessage ?? "")
             }
         }
     }
@@ -103,31 +123,33 @@ struct TaskDetailView: View {
         isLoading = true
         
         let taskToSave = TodoTask(
-            id: taskId,
+            id: taskId ?? UUID().uuidString,
             title: title,
             description: description,
             isCompleted: isCompleted,
+            estimatedMinutes: estimatedMinutes,
+            dueDate: hasDueDate ? dueDate : nil,
             createdAt: Date(),
             updatedAt: Date(),
-            userId: ""
+            userId: Auth.auth().currentUser?.uid ?? ""
         )
         
-        _Concurrency.detach {
+        Task {
             do {
-                if self.isEditing {
-                    try await self.taskService.updateTask(taskToSave)
+                if isEditing {
+                    try await taskService.updateTask(taskToSave)
                 } else {
-                    try await self.taskService.createTask(taskToSave)
+                    try await taskService.createTask(taskToSave)
                 }
                 
                 await MainActor.run {
-                    self.isLoading = false
-                    self.dismiss()
+                    isLoading = false
+                    dismiss()
                 }
             } catch {
                 await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.isLoading = false
+                    errorMessage = error.localizedDescription
+                    isLoading = false
                 }
             }
         }
@@ -138,18 +160,18 @@ struct TaskDetailView: View {
         
         isLoading = true
         
-        _Concurrency.detach {
+        Task {
             do {
-                try await self.taskService.deleteTask(id)
+                try await taskService.deleteTask(id)
                 
                 await MainActor.run {
-                    self.isLoading = false
-                    self.dismiss()
+                    isLoading = false
+                    dismiss()
                 }
             } catch {
                 await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.isLoading = false
+                    errorMessage = error.localizedDescription
+                    isLoading = false
                 }
             }
         }

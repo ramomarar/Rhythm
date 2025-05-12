@@ -9,27 +9,6 @@ import Foundation
 import FirebaseFirestore
 import FirebaseAuth
 
-// MARK: - Task Model
-struct TodoTask: Identifiable, Codable {
-    var id: String?
-    var title: String
-    var description: String
-    var isCompleted: Bool
-    var createdAt: Date
-    var updatedAt: Date
-    var userId: String
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case description
-        case isCompleted
-        case createdAt
-        case updatedAt
-        case userId
-    }
-}
-
 // MARK: - Task Error
 enum TaskError: Error {
     case encodingError

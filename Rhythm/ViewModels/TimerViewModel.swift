@@ -10,6 +10,9 @@ import Combine
 import FirebaseAuth
 import FirebaseFirestore
 
+// Import the Task model
+@_exported import struct Rhythm.TodoTask
+
 @MainActor
 class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int
@@ -18,10 +21,12 @@ class TimerViewModel: ObservableObject {
     @Published var currentStreak: Int = 0
     @Published var currentSession: Session
     @Published var error: String?
+    @Published var taskProgress: Double = 0
 
     private var timer: Timer?
     private var scheduler = PomodoroScheduler()
     private var cancellables = Set<AnyCancellable>()
+    private let task: TodoTask?
     
     var progress: CGFloat {
         return 1 - CGFloat(timeRemaining) / CGFloat(currentSession.duration)
@@ -45,7 +50,8 @@ class TimerViewModel: ObservableObject {
         }
     }
 
-    init() {
+    init(task: TodoTask? = nil) {
+        self.task = task
         // Initialize with temporary values that will be updated
         self.currentSession = Session(type: .focus, duration: 25 * 60)
         self.timeRemaining = 25 * 60
@@ -160,6 +166,16 @@ class TimerViewModel: ObservableObject {
         pauseTimer()
         sessionsCompleted += 1
         currentStreak += 1
+        
+        if let task = task {
+            // Update task progress
+            let sessionLength = UserDefaults.standard.integer(forKey: "focusDuration") > 0 
+                ? UserDefaults.standard.integer(forKey: "focusDuration") 
+                : 25
+            let totalMinutes = task.estimatedMinutes
+            let completedMinutes = sessionsCompleted * sessionLength
+            taskProgress = min(Double(completedMinutes) / Double(totalMinutes), 1.0)
+        }
         
         var completedSession = currentSession
         completedSession.completed = true

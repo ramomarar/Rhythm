@@ -7,12 +7,39 @@
 
 import SwiftUI
 
+// Import the Task model
+@_exported import struct Rhythm.TodoTask
+
 struct PomodoroView: View {
-    @StateObject private var viewModel = TimerViewModel()
+    @StateObject private var viewModel: TimerViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dismiss) private var dismiss
+    
+    let task: TodoTask?
+    
+    init(task: TodoTask? = nil) {
+        self.task = task
+        _viewModel = StateObject(wrappedValue: TimerViewModel(task: task))
+    }
 
     var body: some View {
         VStack(spacing: 32) {
+            if let task = task {
+                VStack(spacing: 8) {
+                    Text("Current Task")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Text(task.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                    Text("Estimated \(task.estimatedSessions) session\(task.estimatedSessions == 1 ? "" : "s")")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.bottom)
+            }
+            
             Text(viewModel.stateTitle)
                 .font(.title)
                 .fontWeight(.bold)
@@ -54,6 +81,31 @@ struct PomodoroView: View {
                 StatView(title: "Session Type", value: viewModel.currentSession.type.rawValue.capitalized)
             }
             .padding(.top, 32)
+            
+            if let task = task {
+                Button(action: {
+                    // Mark task as completed when all estimated sessions are done
+                    if viewModel.sessionsCompleted >= task.estimatedSessions {
+                        Task {
+                            var updatedTask = task
+                            updatedTask.isCompleted = true
+                            try? await TaskDataService().updateTask(updatedTask)
+                        }
+                    }
+                    dismiss()
+                }) {
+                    Text("Complete Task")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .cornerRadius(12)
+                }
+                .disabled(viewModel.sessionsCompleted < task.estimatedSessions)
+                .opacity(viewModel.sessionsCompleted >= task.estimatedSessions ? 1 : 0.5)
+                .padding(.top)
+            }
         }
         .padding()
         .onChange(of: scenePhase) { newPhase in
