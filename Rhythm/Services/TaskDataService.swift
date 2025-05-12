@@ -56,7 +56,9 @@ class TaskDataService: ObservableObject {
         newTask.updatedAt = Date()
         
         do {
-            let data = try JSONEncoder().encode(newTask)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .secondsSince1970
+            let data = try encoder.encode(newTask)
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).addDocument(data: dict)
         } catch let error as EncodingError {
@@ -139,7 +141,9 @@ class TaskDataService: ObservableObject {
         updatedTask.updatedAt = Date()
         
         do {
-            let data = try JSONEncoder().encode(updatedTask)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .secondsSince1970
+            let data = try encoder.encode(updatedTask)
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).document(taskId).setData(dict)
         } catch let error as EncodingError {

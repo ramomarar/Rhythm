@@ -24,6 +24,7 @@ struct TaskListView: View {
     @State private var showingPomodoro = false
     @State private var selectedTask: TodoTask?
     @State private var showingTaskDetail = false
+    @State private var pomodoroTask: TodoTask? = nil
     
     init(initialFilter: TaskFilter? = nil) {
         _selectedFilter = State(initialValue: initialFilter ?? .all)
@@ -114,8 +115,21 @@ struct TaskListView: View {
             }) {
                 if let task = selectedTask {
                     NavigationView {
-                        TaskDetailSheet(task: task, taskService: taskService)
+                        TaskDetailSheet(task: task, taskService: taskService, onStartPomodoro: {
+                            pomodoroTask = task
+                            showingTaskDetail = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showingPomodoro = true
+                            }
+                        })
                     }
+                }
+            }
+            .fullScreenCover(isPresented: $showingPomodoro, onDismiss: {
+                pomodoroTask = nil
+            }) {
+                if let task = pomodoroTask {
+                    PomodoroView(task: task)
                 }
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
@@ -160,7 +174,6 @@ struct TaskListView: View {
 
 struct TaskRowView: View {
     let task: TodoTask
-    @State private var showingPomodoro = false
     
     var body: some View {
         HStack {
@@ -194,17 +207,9 @@ struct TaskRowView: View {
             if task.isCompleted {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            } else {
-                Button(action: { showingPomodoro = true }) {
-                    Image(systemName: "timer")
-                        .foregroundColor(.blue)
-                }
             }
         }
         .padding(.vertical, 4)
-        .fullScreenCover(isPresented: $showingPomodoro) {
-            PomodoroView(task: task)
-        }
     }
 }
 
@@ -212,7 +217,7 @@ struct TaskDetailSheet: View {
     let task: TodoTask
     let taskService: TaskDataService
     @State private var showingEditSheet = false
-    @State private var showingPomodoro = false
+    let onStartPomodoro: () -> Void
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -245,7 +250,7 @@ struct TaskDetailSheet: View {
                     
                     // Action Buttons
                     VStack(spacing: 12) {
-                        Button(action: { showingPomodoro = true }) {
+                        Button(action: { onStartPomodoro() }) {
                             HStack {
                                 Image(systemName: "timer")
                                 Text("Start Pomodoro Session")
@@ -284,9 +289,6 @@ struct TaskDetailSheet: View {
             }
             .sheet(isPresented: $showingEditSheet) {
                 TaskDetailView(task: task, taskService: taskService)
-            }
-            .sheet(isPresented: $showingPomodoro) {
-                PomodoroView(task: task)
             }
         }
     }

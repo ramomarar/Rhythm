@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
+    @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -58,7 +59,7 @@ struct SettingsView: View {
                 
                 Section {
                     Button(role: .destructive) {
-                        viewModel.signOut()
+                        authViewModel.signOut()
                     } label: {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
