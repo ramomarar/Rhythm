@@ -76,40 +76,42 @@ struct HomeView: View {
                         .padding(.horizontal)
                         
                         // Recent/Upcoming Tasks
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Upcoming Tasks")
-                                .font(.headline)
-                            if viewModel.upcomingTaskList.isEmpty {
-                                Text("No upcoming tasks. Enjoy your day!")
-                                    .foregroundColor(.gray)
-                                    .font(.subheadline)
-                            } else {
-                                ForEach(viewModel.upcomingTaskList.prefix(3), id: \.self) { task in
-                                    Button(action: {
-                                        viewModel.toggleTaskCompletion(task)
-                                    }) {
-                                        HStack {
-                                            Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                                                .foregroundColor(task.completed ? .green : .gray)
-                                            Text(task.title)
-                                                .fontWeight(.medium)
-                                                .foregroundColor(.primary)
-                                            Spacer()
-                                            Text(task.dueDateString)
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
+                        NavigationLink(destination: TaskListView(initialFilter: .active)) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Upcoming Tasks")
+                                    .font(.headline)
+                                if viewModel.upcomingTaskList.isEmpty {
+                                    Text("No upcoming tasks. Enjoy your day!")
+                                        .foregroundColor(.gray)
+                                        .font(.subheadline)
+                                } else {
+                                    ForEach(viewModel.upcomingTaskList.prefix(3), id: \.self) { task in
+                                        Button(action: {
+                                            viewModel.toggleTaskCompletion(task)
+                                        }) {
+                                            HStack {
+                                                Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundColor(task.completed ? .green : .gray)
+                                                Text(task.title)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.primary)
+                                                Spacer()
+                                                Text(task.dueDateString)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .padding(.vertical, 6)
                                         }
-                                        .padding(.vertical, 6)
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
-                        .padding(.horizontal)
+                        .buttonStyle(PlainButtonStyle())
                         
                         // TEMPORARY SECTION - Chloe's Timer Features for Testing
                         VStack(alignment: .leading, spacing: 12) {
