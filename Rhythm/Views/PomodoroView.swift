@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// Import the Task model
-@_exported import struct Rhythm.TodoTask
-
 struct PomodoroView: View {
     @StateObject private var viewModel: TimerViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -86,7 +83,7 @@ struct PomodoroView: View {
                 Button(action: {
                     // Mark task as completed when all estimated sessions are done
                     if viewModel.sessionsCompleted >= task.estimatedSessions {
-                        Swift.Task {
+                        Task {
                             var updatedTask = task
                             updatedTask.isCompleted = true
                             try? await TaskDataService().updateTask(updatedTask)
