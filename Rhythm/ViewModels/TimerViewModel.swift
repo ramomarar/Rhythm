@@ -10,9 +10,6 @@ import Combine
 import FirebaseAuth
 import FirebaseFirestore
 
-// Import the Task model
-@_exported import struct Rhythm.TodoTask
-
 @MainActor
 class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int
@@ -24,7 +21,6 @@ class TimerViewModel: ObservableObject {
     @Published var taskProgress: Double = 0
 
     private var timer: Timer?
-    private var scheduler = PomodoroScheduler()
     private var cancellables = Set<AnyCancellable>()
     private let task: TodoTask?
     
@@ -52,24 +48,9 @@ class TimerViewModel: ObservableObject {
 
     init(task: TodoTask? = nil) {
         self.task = task
-        // Initialize with temporary values that will be updated
         self.currentSession = Session(type: .focus, duration: 25 * 60)
         self.timeRemaining = 25 * 60
-        
         setupSettingsObserver()
-        loadData()
-        
-        // Load initial settings
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
-        Firestore.firestore().collection("pomodoro_settings").document(userId).getDocument { [weak self] snapshot, error in
-            guard let self = self,
-                  let data = snapshot?.data() else { return }
-            
-            let focusDuration = data["focusDuration"] as? Int ?? 25
-            self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
-            self.timeRemaining = focusDuration * 60
-        }
     }
     
     private func setupSettingsObserver() {
@@ -78,34 +59,16 @@ class TimerViewModel: ObservableObject {
                 guard let self = self,
                       let userInfo = notification.userInfo else { return }
                 
-                // Store current timer state
                 let wasActive = self.isTimerActive
-                
-                // Pause timer if it's running
                 if wasActive {
                     self.pauseTimer()
                 }
                 
-                // Update session duration based on current type
-                switch self.currentSession.type {
-                case .focus:
-                    if let focusDuration = userInfo["focusDuration"] as? Int {
-                        self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
-                        self.timeRemaining = focusDuration * 60
-                    }
-                case .shortBreak:
-                    if let shortBreakDuration = userInfo["shortBreakDuration"] as? Int {
-                        self.currentSession = Session(type: .shortBreak, duration: TimeInterval(shortBreakDuration * 60))
-                        self.timeRemaining = shortBreakDuration * 60
-                    }
-                case .longBreak:
-                    if let longBreakDuration = userInfo["longBreakDuration"] as? Int {
-                        self.currentSession = Session(type: .longBreak, duration: TimeInterval(longBreakDuration * 60))
-                        self.timeRemaining = longBreakDuration * 60
-                    }
+                if let focusDuration = userInfo["focusDuration"] as? Int {
+                    self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
+                    self.timeRemaining = focusDuration * 60
                 }
                 
-                // Restart timer if it was running
                 if wasActive {
                     self.startTimer()
                 }
@@ -113,23 +76,6 @@ class TimerViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    private func loadData() {
-        scheduler.fetchSessions { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.scheduler.observeSessions()
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.error = error.localizedDescription
-                }
-            }
-        }
-    }
-
     func startTimer() {
         guard !isTimerActive else { return }
         isTimerActive = true
@@ -177,23 +123,19 @@ class TimerViewModel: ObservableObject {
             taskProgress = min(Double(completedMinutes) / Double(totalMinutes), 1.0)
         }
         
-        var completedSession = currentSession
-        completedSession.completed = true
+        // Get next session based on current type
+        switch currentSession.type {
+        case .focus:
+            currentSession = Session(type: .shortBreak, duration: 5 * 60)
+        case .shortBreak:
+            currentSession = Session(type: .focus, duration: 25 * 60)
+        case .longBreak:
+            currentSession = Session(type: .focus, duration: 25 * 60)
+        }
         
-        getNextSession()
+        timeRemaining = Int(currentSession.duration)
     }
     
-    private func getNextSession() {
-        scheduler.getNextSession { [weak self] nextSession in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                self.currentSession = nextSession
-                self.timeRemaining = Int(nextSession.duration)
-            }
-        }
-    }
-
     func handleForegroundTransition() {
         if isTimerActive {
             startTimer()

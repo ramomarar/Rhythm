@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// Import the Task model
-@_exported import struct Rhythm.TodoTask
-
 enum TaskFilter: String, CaseIterable {
     case all = "All"
     case active = "Active"
@@ -89,7 +86,9 @@ struct TaskListView: View {
                         }
                     }
                     .refreshable {
-                        await loadTasks()
+                        Task {
+                            await loadTasks()
+                        }
                     }
                 }
             }
@@ -105,9 +104,7 @@ struct TaskListView: View {
                 TaskDetailView(taskService: taskService)
             }
             .sheet(item: $selectedTask) { task in
-                NavigationView {
-                    TaskDetailView(task: task, taskService: taskService)
-                }
+                TaskDetailView(task: task, taskService: taskService)
             }
             .sheet(isPresented: $showingPomodoro) {
                 if let task = selectedTask {

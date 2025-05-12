@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// Import the Task model
-@_exported import struct Rhythm.TodoTask
-
 struct TaskDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var taskService: TaskDataService
