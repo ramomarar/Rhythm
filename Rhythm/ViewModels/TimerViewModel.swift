@@ -9,11 +9,8 @@ import SwiftUI
 import Combine
 import FirebaseAuth
 import FirebaseFirestore
-import XCTest
 
-  @testable import Rhythm
-  
-  @MainActor
+@MainActor
 class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int
     @Published var isTimerActive: Bool = false
@@ -22,34 +19,7 @@ class TimerViewModel: ObservableObject {
     @Published var currentSession: Session
     @Published var error: String?
 
-class TimerViewModelTests: XCTestCase {
-    var vm: TimerViewModel!
-
-    override func setUp() {
-        super.setUp()
-        vm = TimerViewModel()
-    }
-
-    func testStartPomodoroSetsRemaining() {
-        vm.startPomodoro()
-        XCTAssertEqual(vm.remainingTime, AppDurations.pomodoro)
-        XCTAssertTrue(vm.isRunning)
-    }
-
-    func testPauseStopsTimer() {
-        vm.startPomodoro()
-        vm.pause()
-        XCTAssertFalse(vm.isRunning)
-    }
-
-    func testResetClearsTimer() {
-        vm.startPomodoro()
-        vm.reset()
-        XCTAssertEqual(vm.remainingTime, 0)
-        XCTAssertFalse(vm.isRunning)
-    }
-}  
-  private var timer: Timer?
+    private var timer: Timer?
     private var scheduler = PomodoroScheduler()
     private var cancellables = Set<AnyCancellable>()
     
