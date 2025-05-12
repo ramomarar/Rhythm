@@ -86,7 +86,7 @@ struct TaskListView: View {
                         }
                     }
                     .refreshable {
-                        Swift.Task {
+                        Task {
                             await loadTasks()
                         }
                     }
@@ -134,7 +134,7 @@ struct TaskListView: View {
     }
     
     private func deleteTasksAt(_ indexSet: IndexSet) {
-        Swift.Task {
+        Task {
             for index in indexSet {
                 let task = filteredTasks[index]
                 if let id = task.id {

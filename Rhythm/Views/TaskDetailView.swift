@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct TaskDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -118,7 +119,6 @@ struct TaskDetailView: View {
     
     private func performSaveTask() {
         isLoading = true
-        
         let taskToSave = TodoTask(
             id: taskId ?? UUID().uuidString,
             title: title,
@@ -130,15 +130,13 @@ struct TaskDetailView: View {
             updatedAt: Date(),
             userId: Auth.auth().currentUser?.uid ?? ""
         )
-        
-        Swift.Task {
+        Task {
             do {
                 if isEditing {
                     try await taskService.updateTask(taskToSave)
                 } else {
                     try await taskService.createTask(taskToSave)
                 }
-                
                 await MainActor.run {
                     isLoading = false
                     dismiss()
@@ -154,13 +152,10 @@ struct TaskDetailView: View {
     
     private func performDeleteTask() {
         guard let id = taskId else { return }
-        
         isLoading = true
-        
-        Swift.Task {
+        Task {
             do {
                 try await taskService.deleteTask(id)
-                
                 await MainActor.run {
                     isLoading = false
                     dismiss()
