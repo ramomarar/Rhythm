@@ -37,12 +37,12 @@
 **Responsibility:** Pomodoro system, timers, and session handling
 
 **Tasks:**
-- [ ] Implement countdown timer engine in `TimerHelper.swift`
-- [ ] Build `TimerViewModel.swift` with timer logic (start, pause, reset)
-- [ ] Integrate long/short breaks and session state
-- [ ] Add optional streaks or session counter
-- [ ] Work with Chris to bind `PomodoroView` to timer engine
-- [ ] Handle timer persistence when app backgrounded (`ScenePhase`)
+- [X] Implement countdown timer engine in `TimerHelper.swift`
+- [X] Build `TimerViewModel.swift` with timer logic (start, pause, reset)
+- [X] Integrate long/short breaks and session state
+- [X] Add optional streaks or session counter
+- [X] Work with Chris to bind `PomodoroView` to timer engine
+- [X] Handle timer persistence when app backgrounded (`ScenePhase`)
 
 ---
 

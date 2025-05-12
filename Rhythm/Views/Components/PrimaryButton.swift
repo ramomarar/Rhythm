@@ -42,6 +42,6 @@ struct PrimaryButton_Previews: PreviewProvider {
             PrimaryButton(title: "Sign Up", action: {}, isLoading: true)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(.gray.opacity(0.2))
     }
 } 

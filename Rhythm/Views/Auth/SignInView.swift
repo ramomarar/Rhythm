@@ -55,33 +55,26 @@ struct SignInView: View {
                         signInUser()
                     }, isLoading: authViewModel.isLoading)
                     
-                    // Sign in with providers
+                    // Sign in with Google
                     VStack(spacing: 16) {
                         Text("Sign in with")
                             .foregroundColor(.gray)
-                        HStack(spacing: 20) {
-                            Button {
-                                // Handle Apple sign in
-                            } label: {
-                                Image(systemName: "apple.logo")
+                        Button {
+                            signInWithGoogle()
+                        } label: {
+                            HStack {
+                                Image(systemName: "g.circle.fill")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 24, height: 24)
-                                    .padding()
-                                    .background(Color(.systemGray6))
-                                    .clipShape(Circle())
+                                Text("Continue with Google")
+                                    .fontWeight(.semibold)
                             }
-                            Button {
-                                // Handle Google sign in
-                            } label: {
-                                Image("google_logo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                                    .padding()
-                                    .background(Color(.systemGray6))
-                                    .clipShape(Circle())
-                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(12)
                         }
                     }
                     Spacer()
@@ -110,6 +103,16 @@ struct SignInView: View {
         _Concurrency.detach {
             do {
                 try await self.authViewModel.signIn(withEmail: self.email, password: self.password)
+            } catch {
+                // Error handling is managed by AuthViewModel
+            }
+        }
+    }
+    
+    private func signInWithGoogle() {
+        _Concurrency.detach {
+            do {
+                try await self.authViewModel.signInWithGoogle()
             } catch {
                 // Error handling is managed by AuthViewModel
             }
