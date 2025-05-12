@@ -44,6 +44,9 @@ class TaskDataService: ObservableObject {
     // MARK: - Create Task
     func createTask(_ task: TodoTask) async throws {
         guard let userId = Auth.auth().currentUser?.uid else {
+            DispatchQueue.main.async {
+                self.error = .unauthorized
+            }
             throw TaskError.unauthorized
         }
         
@@ -57,8 +60,14 @@ class TaskDataService: ObservableObject {
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).addDocument(data: dict)
         } catch let error as EncodingError {
+            DispatchQueue.main.async {
+                self.error = .encodingError(error.localizedDescription)
+            }
             throw TaskError.encodingError(error.localizedDescription)
         } catch {
+            DispatchQueue.main.async {
+                self.error = .unknown(error.localizedDescription)
+            }
             throw TaskError.unknown(error.localizedDescription)
         }
     }
@@ -66,6 +75,9 @@ class TaskDataService: ObservableObject {
     // MARK: - Read Tasks
     func fetchTasks() async throws {
         guard let userId = Auth.auth().currentUser?.uid else {
+            DispatchQueue.main.async {
+                self.error = .unauthorized
+            }
             throw TaskError.unauthorized
         }
         
@@ -75,7 +87,7 @@ class TaskDataService: ObservableObject {
                 .order(by: "createdAt", descending: true)
                 .getDocuments()
             
-            self.tasks = try snapshot.documents.compactMap { document in
+            let decodedTasks = try snapshot.documents.compactMap { document in
                 var taskDict = document.data()
                 taskDict["id"] = document.documentID
                 let data = try JSONSerialization.data(withJSONObject: taskDict)
@@ -98,9 +110,18 @@ class TaskDataService: ObservableObject {
                 }
                 return try decoder.decode(TodoTask.self, from: data)
             }
+            DispatchQueue.main.async {
+                self.tasks = decodedTasks
+            }
         } catch let error as DecodingError {
+            DispatchQueue.main.async {
+                self.error = .decodingError(error.localizedDescription)
+            }
             throw TaskError.decodingError(error.localizedDescription)
         } catch {
+            DispatchQueue.main.async {
+                self.error = .unknown(error.localizedDescription)
+            }
             throw TaskError.unknown(error.localizedDescription)
         }
     }
@@ -108,6 +129,9 @@ class TaskDataService: ObservableObject {
     // MARK: - Update Task
     func updateTask(_ task: TodoTask) async throws {
         guard let taskId = task.id else {
+            DispatchQueue.main.async {
+                self.error = .unknown("Task ID is missing")
+            }
             throw TaskError.unknown("Task ID is missing")
         }
         
@@ -119,8 +143,14 @@ class TaskDataService: ObservableObject {
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).document(taskId).setData(dict)
         } catch let error as EncodingError {
+            DispatchQueue.main.async {
+                self.error = .encodingError(error.localizedDescription)
+            }
             throw TaskError.encodingError(error.localizedDescription)
         } catch {
+            DispatchQueue.main.async {
+                self.error = .unknown(error.localizedDescription)
+            }
             throw TaskError.unknown(error.localizedDescription)
         }
     }
@@ -130,6 +160,9 @@ class TaskDataService: ObservableObject {
         do {
             try await db.collection(tasksCollection).document(taskId).delete()
         } catch {
+            DispatchQueue.main.async {
+                self.error = .networkError(error.localizedDescription)
+            }
             throw TaskError.networkError(error.localizedDescription)
         }
     }
