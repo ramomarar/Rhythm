@@ -11,24 +11,24 @@ import FirebaseAuth
 
 // MARK: - Task Error
 enum TaskError: Error {
-    case encodingError
-    case decodingError
-    case networkError
+    case encodingError(String)
+    case decodingError(String)
+    case networkError(String)
     case unauthorized
-    case unknown
+    case unknown(String)
     
     var localizedDescription: String {
         switch self {
-        case .encodingError:
-            return "Failed to encode task data"
-        case .decodingError:
-            return "Failed to decode task data"
-        case .networkError:
-            return "Network error occurred"
+        case .encodingError(let message):
+            return "Failed to encode task data: \(message)"
+        case .decodingError(let message):
+            return "Failed to decode task data: \(message)"
+        case .networkError(let message):
+            return "Network error occurred: \(message)"
         case .unauthorized:
             return "User is not authorized"
-        case .unknown:
-            return "An unknown error occurred"
+        case .unknown(let message):
+            return "An unknown error occurred: \(message)"
         }
     }
 }
@@ -56,8 +56,10 @@ class TaskDataService: ObservableObject {
             let data = try JSONEncoder().encode(newTask)
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).addDocument(data: dict)
+        } catch let error as EncodingError {
+            throw TaskError.encodingError(error.localizedDescription)
         } catch {
-            throw TaskError.encodingError
+            throw TaskError.unknown(error.localizedDescription)
         }
     }
     
@@ -78,17 +80,35 @@ class TaskDataService: ObservableObject {
                 taskDict["id"] = document.documentID
                 let data = try JSONSerialization.data(withJSONObject: taskDict)
                 let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .custom { decoder in
+                    let container = try decoder.singleValueContainer()
+                    // Try to decode as Double (UNIX timestamp)
+                    if let timeInterval = try? container.decode(Double.self) {
+                        return Date(timeIntervalSince1970: timeInterval)
+                    }
+                    // Try to decode as Int (UNIX timestamp)
+                    if let timeInterval = try? container.decode(Int.self) {
+                        return Date(timeIntervalSince1970: Double(timeInterval))
+                    }
+                    // Try to decode as Firestore Timestamp (if ever used)
+                    if let timestamp = try? container.decode(Timestamp.self) {
+                        return timestamp.dateValue()
+                    }
+                    throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date")
+                }
                 return try decoder.decode(TodoTask.self, from: data)
             }
+        } catch let error as DecodingError {
+            throw TaskError.decodingError(error.localizedDescription)
         } catch {
-            throw TaskError.decodingError
+            throw TaskError.unknown(error.localizedDescription)
         }
     }
     
     // MARK: - Update Task
     func updateTask(_ task: TodoTask) async throws {
         guard let taskId = task.id else {
-            throw TaskError.unknown
+            throw TaskError.unknown("Task ID is missing")
         }
         
         var updatedTask = task
@@ -98,8 +118,10 @@ class TaskDataService: ObservableObject {
             let data = try JSONEncoder().encode(updatedTask)
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             try await db.collection(tasksCollection).document(taskId).setData(dict)
+        } catch let error as EncodingError {
+            throw TaskError.encodingError(error.localizedDescription)
         } catch {
-            throw TaskError.encodingError
+            throw TaskError.unknown(error.localizedDescription)
         }
     }
     
@@ -108,7 +130,7 @@ class TaskDataService: ObservableObject {
         do {
             try await db.collection(tasksCollection).document(taskId).delete()
         } catch {
-            throw TaskError.networkError
+            throw TaskError.networkError(error.localizedDescription)
         }
     }
     
@@ -121,19 +143,40 @@ class TaskDataService: ObservableObject {
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let documents = snapshot?.documents else {
-                    self?.error = .networkError
+                    self?.error = .networkError(error?.localizedDescription ?? "Unknown network error")
                     return
                 }
                 
-                self?.tasks = documents.compactMap { document in
-                    var taskDict = document.data()
-                    taskDict["id"] = document.documentID
-                    do {
+                do {
+                    let decodedTasks = try documents.compactMap { document in
+                        var taskDict = document.data()
+                        taskDict["id"] = document.documentID
                         let data = try JSONSerialization.data(withJSONObject: taskDict)
                         let decoder = JSONDecoder()
+                        decoder.dateDecodingStrategy = .custom { decoder in
+                            let container = try decoder.singleValueContainer()
+                            // Try to decode as Double (UNIX timestamp)
+                            if let timeInterval = try? container.decode(Double.self) {
+                                return Date(timeIntervalSince1970: timeInterval)
+                            }
+                            // Try to decode as Int (UNIX timestamp)
+                            if let timeInterval = try? container.decode(Int.self) {
+                                return Date(timeIntervalSince1970: Double(timeInterval))
+                            }
+                            // Try to decode as Firestore Timestamp (if ever used)
+                            if let timestamp = try? container.decode(Timestamp.self) {
+                                return timestamp.dateValue()
+                            }
+                            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date")
+                        }
                         return try decoder.decode(TodoTask.self, from: data)
-                    } catch {
-                        return nil
+                    }
+                    DispatchQueue.main.async {
+                        self?.tasks = decodedTasks
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        self?.error = .decodingError(error.localizedDescription)
                     }
                 }
             }

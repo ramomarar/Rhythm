@@ -109,7 +109,9 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 TaskDetailView(taskService: taskService)
             }
-            .sheet(isPresented: $showingTaskDetail) {
+            .sheet(isPresented: $showingTaskDetail, onDismiss: {
+                selectedTask = nil
+            }) {
                 if let task = selectedTask {
                     TaskDetailSheet(task: task, taskService: taskService)
                 }
