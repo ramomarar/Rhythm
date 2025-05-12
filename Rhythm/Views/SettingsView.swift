@@ -55,6 +55,17 @@ struct SettingsView: View {
                     }
                     .foregroundColor(.red)
                 }
+                
+                Section {
+                    Button(role: .destructive) {
+                        viewModel.signOut()
+                    } label: {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                            Text("Logout")
+                        }
+                    }
+                }
             }
             .navigationTitle("Timer Settings")
             .toolbar {

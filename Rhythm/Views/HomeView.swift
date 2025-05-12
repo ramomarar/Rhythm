@@ -106,55 +106,13 @@ struct HomeView: View {
                                     }
                                 }
                             }
+                            .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(16)
                             .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        
-                        // TEMPORARY SECTION - Chloe's Timer Features for Testing
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Timer Features Testing")
-                                .font(.headline)
-                                .foregroundColor(.orange)
-                            
-                            NavigationLink(destination: PomodoroView()) {
-                                HStack {
-                                    Image(systemName: "timer")
-                                        .foregroundColor(.white)
-                                    Text("Open Pomodoro Timer")
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.orange)
-                                .cornerRadius(12)
-                            }
-                            
-                            NavigationLink(destination: SettingsView()) {
-                                HStack {
-                                    Image(systemName: "gear")
-                                        .foregroundColor(.white)
-                                    Text("Timer Settings")
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(12)
-                            }
-                            
-                            Text("Note: This section is temporary for testing")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                         .padding(.horizontal)
                         
                         Spacer()
@@ -182,11 +140,6 @@ struct HomeView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         NavigationLink(destination: SettingsView()) {
                             Image(systemName: "gear")
-                        }
-                    }
-                    ToolbarItem(placement: .automatic) {
-                        Button("Logout") {
-                            viewModel.signOut()
                         }
                     }
                 }

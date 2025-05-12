@@ -113,7 +113,9 @@ struct TaskListView: View {
                 selectedTask = nil
             }) {
                 if let task = selectedTask {
-                    TaskDetailSheet(task: task, taskService: taskService)
+                    NavigationView {
+                        TaskDetailSheet(task: task, taskService: taskService)
+                    }
                 }
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
@@ -200,7 +202,7 @@ struct TaskRowView: View {
             }
         }
         .padding(.vertical, 4)
-        .sheet(isPresented: $showingPomodoro) {
+        .fullScreenCover(isPresented: $showingPomodoro) {
             PomodoroView(task: task)
         }
     }

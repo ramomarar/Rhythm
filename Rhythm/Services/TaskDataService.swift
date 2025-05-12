@@ -94,6 +94,10 @@ class TaskDataService: ObservableObject {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .custom { decoder in
                     let container = try decoder.singleValueContainer()
+                    // Try to decode as Firestore Timestamp first
+                    if let timestamp = try? container.decode(Timestamp.self) {
+                        return timestamp.dateValue()
+                    }
                     // Try to decode as Double (UNIX timestamp)
                     if let timeInterval = try? container.decode(Double.self) {
                         return Date(timeIntervalSince1970: timeInterval)
@@ -101,10 +105,6 @@ class TaskDataService: ObservableObject {
                     // Try to decode as Int (UNIX timestamp)
                     if let timeInterval = try? container.decode(Int.self) {
                         return Date(timeIntervalSince1970: Double(timeInterval))
-                    }
-                    // Try to decode as Firestore Timestamp (if ever used)
-                    if let timestamp = try? container.decode(Timestamp.self) {
-                        return timestamp.dateValue()
                     }
                     throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date")
                 }
@@ -188,6 +188,10 @@ class TaskDataService: ObservableObject {
                         let decoder = JSONDecoder()
                         decoder.dateDecodingStrategy = .custom { decoder in
                             let container = try decoder.singleValueContainer()
+                            // Try to decode as Firestore Timestamp first
+                            if let timestamp = try? container.decode(Timestamp.self) {
+                                return timestamp.dateValue()
+                            }
                             // Try to decode as Double (UNIX timestamp)
                             if let timeInterval = try? container.decode(Double.self) {
                                 return Date(timeIntervalSince1970: timeInterval)
@@ -195,10 +199,6 @@ class TaskDataService: ObservableObject {
                             // Try to decode as Int (UNIX timestamp)
                             if let timeInterval = try? container.decode(Int.self) {
                                 return Date(timeIntervalSince1970: Double(timeInterval))
-                            }
-                            // Try to decode as Firestore Timestamp (if ever used)
-                            if let timestamp = try? container.decode(Timestamp.self) {
-                                return timestamp.dateValue()
                             }
                             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date")
                         }
