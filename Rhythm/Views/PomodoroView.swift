@@ -86,7 +86,7 @@ struct PomodoroView: View {
                 Button(action: {
                     // Mark task as completed when all estimated sessions are done
                     if viewModel.sessionsCompleted >= task.estimatedSessions {
-                        Task {
+                        Swift.Task {
                             var updatedTask = task
                             updatedTask.isCompleted = true
                             try? await TaskDataService().updateTask(updatedTask)
@@ -118,7 +118,10 @@ struct PomodoroView: View {
                 break
             }
         }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.error != nil },
+            set: { if !$0 { viewModel.error = nil } }
+        )) {
             Button("OK") { viewModel.error = nil }
         } message: {
             Text(viewModel.error ?? "")

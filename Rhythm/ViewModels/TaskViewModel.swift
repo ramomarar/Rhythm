@@ -10,7 +10,7 @@ import FirebaseFirestore
 import FirebaseAuth
 
 // MARK: - Task Model
-struct Task: Identifiable, Codable {
+struct AppTask: Identifiable, Codable {
     let id: String
     var title: String
     var description: String
@@ -31,7 +31,7 @@ struct Task: Identifiable, Codable {
 // MARK: - TaskViewModel
 @MainActor
 class TaskViewModel: ObservableObject {
-    @Published var tasks: [Task] = []
+    @Published var tasks: [AppTask] = []
     @Published var isLoading = false
     @Published var error: String?
     
@@ -50,7 +50,7 @@ class TaskViewModel: ObservableObject {
                 .getDocuments()
             
             tasks = snapshot.documents.compactMap { document in
-                try? document.data(as: Task.self)
+                try? document.data(as: AppTask.self)
             }
         } catch {
             self.error = error.localizedDescription
@@ -62,7 +62,7 @@ class TaskViewModel: ObservableObject {
     func addTask(title: String, description: String) async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
-        let task = Task(
+        let task = AppTask(
             id: UUID().uuidString,
             title: title,
             description: description,
@@ -79,7 +79,7 @@ class TaskViewModel: ObservableObject {
         }
     }
     
-    func updateTask(_ task: Task) async {
+    func updateTask(_ task: AppTask) async {
         do {
             try await db.collection("tasks").document(task.id).setData(from: task)
             if let index = tasks.firstIndex(where: { $0.id == task.id }) {
@@ -90,7 +90,7 @@ class TaskViewModel: ObservableObject {
         }
     }
     
-    func deleteTask(_ task: Task) async {
+    func deleteTask(_ task: AppTask) async {
         do {
             try await db.collection("tasks").document(task.id).delete()
             tasks.removeAll { $0.id == task.id }

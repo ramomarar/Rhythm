@@ -131,7 +131,7 @@ struct TaskDetailView: View {
             userId: Auth.auth().currentUser?.uid ?? ""
         )
         
-        Task {
+        Swift.Task {
             do {
                 if isEditing {
                     try await taskService.updateTask(taskToSave)
@@ -157,7 +157,7 @@ struct TaskDetailView: View {
         
         isLoading = true
         
-        Task {
+        Swift.Task {
             do {
                 try await taskService.deleteTask(id)
                 
