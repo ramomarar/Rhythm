@@ -110,11 +110,14 @@ struct PomodoroView: View {
             }
         }
         .padding()
-        .onChange(of: scenePhase) { newPhase in
-            if newPhase == .active {
+        .onChange(of: scenePhase) { phase in
+            switch phase {
+            case .active:
                 viewModel.resumeTimer()
-            } else if newPhase == .inactive {
+            case .inactive:
                 viewModel.pauseTimer()
+            default:
+                break
             }
         }
         .alert("Error", isPresented: Binding(
