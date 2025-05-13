@@ -112,12 +112,14 @@ struct TaskListView: View {
             }
             .sheet(isPresented: $showingTaskDetail) {
                 if let task = selectedTask {
-                    TaskDetailView(task: task, taskService: taskService)
-                }
-            }
-            .onChange(of: showingTaskDetail) { newValue in
-                if !newValue {
-                    selectedTask = nil
+                    TaskDetailSheet(
+                        task: task,
+                        taskService: taskService,
+                        onStartPomodoro: {
+                            pomodoroTask = task
+                            showingPomodoro = true
+                        }
+                    )
                 }
             }
             .fullScreenCover(isPresented: $showingPomodoro, onDismiss: {
