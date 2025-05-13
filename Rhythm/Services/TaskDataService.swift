@@ -85,19 +85,14 @@ class TaskDataService: ObservableObject {
     // MARK: - Read Tasks
     func fetchTasks() async throws {
         guard let userId = Auth.auth().currentUser?.uid else {
-            print("[DEBUG] TaskDataService - fetchTasks: No user ID available")
             throw TaskError.unauthorized
         }
-        
-        print("[DEBUG] TaskDataService - fetchTasks: Starting fetch for user \(userId)")
         
         do {
             let snapshot = try await db.collection(tasksCollection)
                 .whereField("userId", isEqualTo: userId)
                 .order(by: "createdAt", descending: true)
                 .getDocuments()
-            
-            print("[DEBUG] TaskDataService - fetchTasks: Got \(snapshot.documents.count) documents")
             
             let decodedTasks = try snapshot.documents.compactMap { document in
                 var taskDict = document.data()
@@ -120,20 +115,11 @@ class TaskDataService: ObservableObject {
                 return try decoder.decode(TodoTask.self, from: data)
             }
             
-            print("[DEBUG] TaskDataService - fetchTasks: Successfully decoded \(decodedTasks.count) tasks")
-            
-            // Print the first task for debugging
-            if let firstTask = decodedTasks.first {
-                print("[DEBUG] TaskDataService - First task: id=\(firstTask.id ?? "nil"), title=\(firstTask.title)")
-            }
-            
             await MainActor.run {
                 self.tasks = decodedTasks
                 self.isInitialized = true
-                print("[DEBUG] TaskDataService - fetchTasks: Updated tasks on MainActor, isInitialized=\(self.isInitialized)")
             }
         } catch {
-            print("[DEBUG] TaskDataService - fetchTasks: Error: \(error.localizedDescription)")
             throw TaskError.decodingError(error.localizedDescription)
         }
     }
@@ -141,14 +127,11 @@ class TaskDataService: ObservableObject {
     // MARK: - Update Task
     func updateTask(_ task: TodoTask) async throws {
         guard let taskId = task.id else {
-            print("[DEBUG] TaskDataService - updateTask: Missing task ID")
             DispatchQueue.main.async {
                 self.error = .unknown("Task ID is missing")
             }
             throw TaskError.unknown("Task ID is missing")
         }
-        
-        print("[DEBUG] TaskDataService - updateTask: Updating task \(taskId), title=\(task.title)")
         
         var updatedTask = task
         updatedTask.updatedAt = Date()
@@ -159,19 +142,14 @@ class TaskDataService: ObservableObject {
             let data = try encoder.encode(updatedTask)
             let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
             
-            print("[DEBUG] TaskDataService - updateTask: Encoded task data, sending to Firestore")
-            
             try await db.collection(tasksCollection).document(taskId).setData(dict)
             
-            print("[DEBUG] TaskDataService - updateTask: Task successfully updated")
         } catch let error as EncodingError {
-            print("[DEBUG] TaskDataService - updateTask: Encoding error: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.error = .encodingError(error.localizedDescription)
             }
             throw TaskError.encodingError(error.localizedDescription)
         } catch {
-            print("[DEBUG] TaskDataService - updateTask: Unknown error: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.error = .unknown(error.localizedDescription)
             }

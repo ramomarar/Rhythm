@@ -24,9 +24,6 @@ final class NotificationService {
 
     func requestAuthorization(completion: ((Bool) -> Void)? = nil) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-            if let error = error {
-                print("Notification auth error: \(error)")
-            }
             completion?(granted)
         }
     }
@@ -43,9 +40,6 @@ final class NotificationService {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(seconds - AppDurations.notificationLead, 1), repeats: false)
         let req = UNNotificationRequest(identifier: "endSessionNotification", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(req) { error in
-            if let error = error {
-                print("Failed to schedule notification: \(error)")
-            }
         }
     }
 

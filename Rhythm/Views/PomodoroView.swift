@@ -16,13 +16,9 @@ struct PomodoroView: View {
     let taskService: TaskDataService
     
     init(task: TodoTask, taskService: TaskDataService) {
-        print("\n\n[DEBUG] ============= POMODORO INIT =============")
         self.task = task
         self.taskService = taskService
         _viewModel = StateObject(wrappedValue: TimerViewModel(task: task))
-        print("[DEBUG] PomodoroView initialized with task: \(task.title), estimatedMinutes: \(task.estimatedMinutes), id: \(task.id ?? "nil")")
-        print("[DEBUG] Task properties: userId: \(task.userId), description: \(task.description)")
-        print("[DEBUG] ============= END INIT =============\n\n")
     }
 
     var body: some View {
@@ -36,7 +32,6 @@ struct PomodoroView: View {
                 Text("If you see this, your task data is broken or missing.")
             }.padding()
             .onAppear {
-                print("[DEBUG] PomodoroView - INVALID TASK DATA appeared")
             }
         } else {
             NavigationView {
@@ -106,7 +101,6 @@ struct PomodoroView: View {
                         // Mark task as completed when all estimated sessions are done
                         if viewModel.sessionsCompleted >= task.estimatedSessions {
                             Task {
-                                print("[DEBUG] PomodoroView - Completing task with initialized service: isInitialized=\(taskService.isInitialized)")
                                 var updatedTask = task
                                 updatedTask.isCompleted = true
                                 try? await taskService.updateTask(updatedTask)
@@ -127,7 +121,6 @@ struct PomodoroView: View {
                     .padding(.top)
 
                     Button(action: {
-                        print("[DEBUG] PomodoroView - Manual close button tapped")
                         dismiss()
                     }) {
                         Text("Exit Pomodoro")
@@ -145,13 +138,11 @@ struct PomodoroView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Close") {
-                            print("[DEBUG] PomodoroView - Close button tapped")
                             dismiss()
                         }
                     }
                 }
                 .onChange(of: scenePhase) { phase in
-                    print("[DEBUG] PomodoroView - scenePhase changed to: \(phase)")
                     switch phase {
                     case .active:
                         viewModel.handleForegroundTransition()
@@ -162,14 +153,11 @@ struct PomodoroView: View {
                     }
                 }
                 .onAppear {
-                    print("[DEBUG] PomodoroView - Main content appeared")
                     if !viewModel.isTimerActive {
-                        print("[DEBUG] PomodoroView - Auto-starting timer")
                         viewModel.startTimer()
                     }
                 }
                 .onDisappear {
-                    print("[DEBUG] PomodoroView - Main content disappeared")
                 }
                 .alert("Error", isPresented: Binding(
                     get: { viewModel.error != nil },

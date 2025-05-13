@@ -292,7 +292,6 @@ class HomeViewModel: ObservableObject {
                 }
                 
                 guard let document = docResult else {
-                    print("No document data")
                     DispatchQueue.main.async {
                         self.displayName = user.displayName ?? "User"
                     }
@@ -308,7 +307,6 @@ class HomeViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error fetching user data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self.displayName = user.displayName ?? "User"
                 }
@@ -320,7 +318,6 @@ class HomeViewModel: ObservableObject {
         do {
             try Auth.auth().signOut()
         } catch {
-            print("Error signing out: \(error.localizedDescription)")
         }
     }
     
