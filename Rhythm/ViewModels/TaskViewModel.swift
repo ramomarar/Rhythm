@@ -59,7 +59,7 @@ class TaskViewModel: ObservableObject {
         isLoading = false
     }
     
-    func addTask(title: String, description: String) async {
+    nonisolated func addTask(title: String, description: String) async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
         let task = AppTask(
@@ -73,29 +73,41 @@ class TaskViewModel: ObservableObject {
         
         do {
             try await db.collection("tasks").document(task.id).setData(from: task)
-            tasks.append(task)
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-    
-    func updateTask(_ task: AppTask) async {
-        do {
-            try await db.collection("tasks").document(task.id).setData(from: task)
-            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                tasks[index] = task
+            await MainActor.run {
+                tasks.append(task)
             }
         } catch {
-            self.error = error.localizedDescription
+            await MainActor.run {
+                self.error = error.localizedDescription
+            }
         }
     }
     
-    func deleteTask(_ task: AppTask) async {
+    nonisolated func updateTask(_ task: AppTask) async {
+        do {
+            try await db.collection("tasks").document(task.id).setData(from: task)
+            await MainActor.run {
+                if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                    tasks[index] = task
+                }
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error.localizedDescription
+            }
+        }
+    }
+    
+    nonisolated func deleteTask(_ task: AppTask) async {
         do {
             try await db.collection("tasks").document(task.id).delete()
-            tasks.removeAll { $0.id == task.id }
+            await MainActor.run {
+                tasks.removeAll { $0.id == task.id }
+            }
         } catch {
-            self.error = error.localizedDescription
+            await MainActor.run {
+                self.error = error.localizedDescription
+            }
         }
     }
 }

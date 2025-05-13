@@ -10,10 +10,11 @@ class AuthViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var isLoading = false
     @Published var error: String?
+    private var authStateListener: AuthStateDidChangeListenerHandle?
     
     init() {
         // Listen for authentication state changes
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        authStateListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 self?.isAuthenticated = user != nil
             }

@@ -10,7 +10,7 @@ class PomodoroSessionService: ObservableObject {
     @Published var error: String?
     
     func saveSession(_ session: Session, completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let userId = Auth.auth().currentUser?.uid else {
+        guard let _ = Auth.auth().currentUser?.uid else {
             let error = NSError(domain: "PomodoroSessionService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
             completion(.failure(error))
             return

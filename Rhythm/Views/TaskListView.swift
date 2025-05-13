@@ -223,7 +223,7 @@ struct TaskRowView: View {
                         .font(.caption)
                         .foregroundColor(.blue)
                     
-                    if let dueDate = task.dueDate {
+                    if task.dueDate != nil {
                         Image(systemName: "calendar")
                             .foregroundColor(.orange)
                         Text(task.formattedDueDate)
@@ -269,7 +269,7 @@ struct TaskDetailSheet: View {
                     // Task Details
                     VStack(alignment: .leading, spacing: 16) {
                         DetailRow(icon: "clock", title: "Estimated Time", value: task.formattedEstimatedTime)
-                        if let dueDate = task.dueDate {
+                        if task.dueDate != nil {
                             DetailRow(icon: "calendar", title: "Due Date", value: task.formattedDueDate)
                         }
                         DetailRow(icon: "checkmark.circle", title: "Status", value: task.isCompleted ? "Completed" : "Active")

@@ -50,10 +50,10 @@
 **Responsibility:** File structure, constants, theme, and testing
 
 **Tasks:**
-- [X] Create reusable `Constants.swift` (colors, durations)
-- [X] Add `Date+Extensions.swift` for date formatting
-- [X] Add `NotificationService.swift` for session alerts
-- [X] Build app-wide navigation flow (tabs or navigation stack)
-- [X] Support light/dark mode via themes
-- [X] Write unit tests for `TaskViewModel` and `TimerViewModel`
-- [X] Polish layout and accessibility (font size, spacing)
+- [ ] Create reusable `Constants.swift` (colors, durations)
+- [ ] Add `Date+Extensions.swift` for date formatting
+- [ ] Add `NotificationService.swift` for session alerts
+- [ ] Build app-wide navigation flow (tabs or navigation stack)
+- [ ] Support light/dark mode via themes
+- [ ] Write unit tests for `TaskViewModel` and `TimerViewModel`
+- [ ] Polish layout and accessibility (font size, spacing)
