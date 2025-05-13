@@ -110,19 +110,14 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 TaskDetailView(taskService: taskService)
             }
-            .sheet(isPresented: $showingTaskDetail, onDismiss: {
-                selectedTask = nil
-            }) {
+            .sheet(isPresented: $showingTaskDetail) {
                 if let task = selectedTask {
-                    NavigationView {
-                        TaskDetailSheet(task: task, taskService: taskService, onStartPomodoro: {
-                            pomodoroTask = task
-                            showingTaskDetail = false
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                showingPomodoro = true
-                            }
-                        })
-                    }
+                    TaskDetailView(task: task, taskService: taskService)
+                }
+            }
+            .onChange(of: showingTaskDetail) { newValue in
+                if !newValue {
+                    selectedTask = nil
                 }
             }
             .fullScreenCover(isPresented: $showingPomodoro, onDismiss: {
