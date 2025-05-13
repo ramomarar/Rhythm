@@ -100,7 +100,7 @@ struct SignInView: View {
     
     private func signInUser() {
         // Create a detached task that won't cause conflicts
-        _Concurrency.detach {
+        Task.detached {
             do {
                 try await self.authViewModel.signIn(withEmail: self.email, password: self.password)
             } catch {
@@ -110,7 +110,7 @@ struct SignInView: View {
     }
     
     private func signInWithGoogle() {
-        _Concurrency.detach {
+        Task.detached {
             do {
                 try await self.authViewModel.signInWithGoogle()
             } catch {

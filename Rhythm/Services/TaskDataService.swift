@@ -34,7 +34,7 @@ enum TaskError: Error {
 }
 
 // MARK: - Task Data Service
-class TaskDataService: ObservableObject {
+class TaskDataService: ObservableObject, @unchecked Sendable {
     private let db = Firestore.firestore()
     private let tasksCollection = "tasks"
     

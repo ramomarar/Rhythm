@@ -128,7 +128,7 @@ struct TaskListView: View {
                     }
                 )
             }
-            .onChange(of: selectedTask) { newValue in
+            .onChange(of: selectedTask) { oldValue, newValue in
                 if newValue == nil && pomodoroTriggered {
                     pomodoroTriggered = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

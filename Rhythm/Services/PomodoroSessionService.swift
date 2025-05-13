@@ -17,7 +17,7 @@ class PomodoroSessionService: ObservableObject {
         }
         
         do {
-            var sessionData = session
+            let sessionData = session
             let data = try JSONEncoder().encode(sessionData)
             guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 let error = NSError(domain: "PomodoroSessionService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to serialize session data"])

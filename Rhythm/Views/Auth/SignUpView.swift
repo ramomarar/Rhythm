@@ -106,7 +106,7 @@ struct SignUpView: View {
     }
     
     private func signUpUser() {
-        _Concurrency.detach {
+        Task.detached {
             do {
                 try await self.authViewModel.createAccount(withEmail: self.email, password: self.password, name: self.name)
                 await MainActor.run {
@@ -119,7 +119,7 @@ struct SignUpView: View {
     }
     
     private func signInWithGoogle() {
-        _Concurrency.detach {
+        Task.detached {
             do {
                 try await self.authViewModel.signInWithGoogle()
                 await MainActor.run {

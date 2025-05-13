@@ -131,8 +131,8 @@ struct PomodoroView: View {
                         }
                     }
                 }
-                .onChange(of: scenePhase) { phase in
-                    switch phase {
+                .onChange(of: scenePhase) { oldPhase, newPhase in
+                    switch newPhase {
                     case .active:
                         viewModel.handleForegroundTransition()
                     case .inactive:

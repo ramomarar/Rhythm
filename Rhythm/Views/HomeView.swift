@@ -272,7 +272,6 @@ class HomeViewModel: ObservableObject {
         DispatchQueue.global().async {
             let db = self.db
             // Create a continuation to bridge between async/await and completion handlers
-            let document: DocumentSnapshot
             do {
                 // Use URLSession synchronously as a workaround
                 let semaphore = DispatchSemaphore(value: 0)

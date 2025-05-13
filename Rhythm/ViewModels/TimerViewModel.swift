@@ -89,7 +89,8 @@ class TimerViewModel: ObservableObject {
         isTimerActive = true
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.updateTimer()
+            guard let self = self else { return }
+            self.updateTimer()
         }
     }
     
