@@ -35,25 +35,26 @@ struct PomodoroView: View {
             }
         } else {
             NavigationView {
-                VStack(spacing: 32) {
-                    VStack(spacing: 8) {
+                VStack(spacing: 24) {
+                    VStack(spacing: 6) {
                         Text("Current Task")
                             .font(.headline)
                             .foregroundColor(.secondary)
                         Text(task.title)
-                            .font(.title2)
+                            .font(.title3)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
+                            .lineLimit(1)
                         Text(task.description)
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
+                            .lineLimit(2)
                             .padding(.horizontal)
                         Text("Estimated \(task.estimatedSessions) session\(task.estimatedSessions == 1 ? "" : "s")")
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                    .padding(.bottom)
                     
                     Text(viewModel.stateTitle)
                         .font(.title)
@@ -63,25 +64,26 @@ struct PomodoroView: View {
                     ZStack {
                         Circle()
                             .stroke(Color.gray.opacity(0.2), lineWidth: 20)
-                            .frame(width: 250, height: 250)
+                            .frame(width: 220, height: 220)
 
                         Circle()
                             .trim(from: 0, to: viewModel.progress)
                             .stroke(Color(hex: "#7B61FF"), style: StrokeStyle(lineWidth: 20, lineCap: .round))
-                            .frame(width: 250, height: 250)
+                            .frame(width: 220, height: 220)
                             .rotationEffect(.degrees(-90))
                             .animation(.linear, value: viewModel.progress)
 
                         VStack(spacing: 8) {
                             Text(viewModel.formattedTime)
-                                .font(.system(size: 48, weight: .bold, design: .rounded))
+                                .font(.system(size: 46, weight: .bold, design: .rounded))
                                 .foregroundColor(.primary)
 
                             Text("\(viewModel.sessionsCompleted) sessions completed")
-                                .font(.subheadline)
+                                .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .padding(.vertical, 8)
 
                     TimerControlsView(
                         isTimerActive: viewModel.isTimerActive,
@@ -95,7 +97,7 @@ struct PomodoroView: View {
                         StatView(title: "Current Streak", value: "\(viewModel.currentStreak)")
                         StatView(title: "Session Type", value: viewModel.currentSession.type.rawValue.capitalized)
                     }
-                    .padding(.top, 32)
+                    .padding(.top, 16)
                     
                     Button(action: {
                         // Mark task as completed when all estimated sessions are done
@@ -118,20 +120,7 @@ struct PomodoroView: View {
                     }
                     .disabled(viewModel.sessionsCompleted < task.estimatedSessions)
                     .opacity(viewModel.sessionsCompleted >= task.estimatedSessions ? 1 : 0.5)
-                    .padding(.top)
-
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Text("Exit Pomodoro")
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.red.opacity(0.8))
-                            .cornerRadius(12)
-                    }
-                    .padding(.top)
+                    .padding(.top, 16)
                 }
                 .padding()
                 .navigationBarTitleDisplayMode(.inline)
