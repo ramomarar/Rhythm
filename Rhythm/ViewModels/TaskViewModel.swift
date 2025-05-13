@@ -16,6 +16,7 @@ struct AppTask: Identifiable, Codable {
     var description: String
     var isCompleted: Bool
     var createdAt: Date
+    var dueDate: Date?
     var userId: String
     
     enum CodingKeys: String, CodingKey {
@@ -24,6 +25,7 @@ struct AppTask: Identifiable, Codable {
         case description
         case isCompleted
         case createdAt
+        case dueDate
         case userId
     }
 }
@@ -59,7 +61,7 @@ class TaskViewModel: ObservableObject {
         isLoading = false
     }
     
-    nonisolated func addTask(title: String, description: String) async {
+    nonisolated func addTask(title: String, description: String, dueDate: Date? = nil) async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
         let task = AppTask(
@@ -68,6 +70,7 @@ class TaskViewModel: ObservableObject {
             description: description,
             isCompleted: false,
             createdAt: Date(),
+            dueDate: dueDate,
             userId: userId
         )
         

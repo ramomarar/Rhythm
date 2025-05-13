@@ -230,7 +230,7 @@ class HomeViewModel: ObservableObject {
                     guard let title = data["title"] as? String,
                           let completed = data["isCompleted"] as? Bool else { return nil }
                     
-                    let timestamp = data["createdAt"] as? Timestamp
+                    let timestamp = data["dueDate"] as? Timestamp
                     let dueDate = timestamp?.dateValue()
                     
                     return DashboardTask(title: title, completed: completed, dueDate: dueDate)
