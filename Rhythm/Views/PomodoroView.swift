@@ -12,121 +12,175 @@ struct PomodoroView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     
-    let task: TodoTask?
+    let task: TodoTask
+    let taskService: TaskDataService
     
-    init(task: TodoTask? = nil) {
+    init(task: TodoTask, taskService: TaskDataService) {
+        print("\n\n[DEBUG] ============= POMODORO INIT =============")
         self.task = task
+        self.taskService = taskService
         _viewModel = StateObject(wrappedValue: TimerViewModel(task: task))
+        print("[DEBUG] PomodoroView initialized with task: \(task.title), estimatedMinutes: \(task.estimatedMinutes), id: \(task.id ?? "nil")")
+        print("[DEBUG] Task properties: userId: \(task.userId), description: \(task.description)")
+        print("[DEBUG] ============= END INIT =============\n\n")
     }
 
     var body: some View {
-        VStack(spacing: 32) {
-            if let task = task {
-                VStack(spacing: 8) {
-                    Text("Current Task")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                    Text(task.title)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                    Text(task.description)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    Text("Estimated \(task.estimatedSessions) session\(task.estimatedSessions == 1 ? "" : "s")")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.bottom)
+        if task.estimatedMinutes <= 0 || task.title.isEmpty {
+            VStack(spacing: 16) {
+                Text("Invalid Task Data").font(.title)
+                Text("Title: \(task.title)")
+                Text("Estimated Minutes: \(task.estimatedMinutes)")
+                Text("userId: \(task.userId)")
+                Text("id: \(task.id ?? "nil")")
+                Text("If you see this, your task data is broken or missing.")
+            }.padding()
+            .onAppear {
+                print("[DEBUG] PomodoroView - INVALID TASK DATA appeared")
             }
-            
-            Text(viewModel.stateTitle)
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 20)
-                    .frame(width: 250, height: 250)
-
-                Circle()
-                    .trim(from: 0, to: viewModel.progress)
-                    .stroke(Color(hex: "#7B61FF"), style: StrokeStyle(lineWidth: 20, lineCap: .round))
-                    .frame(width: 250, height: 250)
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear, value: viewModel.progress)
-
-                VStack(spacing: 8) {
-                    Text(viewModel.formattedTime)
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
+        } else {
+            NavigationView {
+                VStack(spacing: 32) {
+                    VStack(spacing: 8) {
+                        Text("Current Task")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                        Text(task.title)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                        Text(task.description)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                        Text("Estimated \(task.estimatedSessions) session\(task.estimatedSessions == 1 ? "" : "s")")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.bottom)
+                    
+                    Text(viewModel.stateTitle)
+                        .font(.title)
+                        .fontWeight(.bold)
                         .foregroundColor(.primary)
 
-                    Text("\(viewModel.sessionsCompleted) sessions completed")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            }
+                    ZStack {
+                        Circle()
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+                            .frame(width: 250, height: 250)
 
-            TimerControlsView(
-                isTimerActive: viewModel.isTimerActive,
-                onStart: { viewModel.startTimer() },
-                onPause: { viewModel.pauseTimer() },
-                onReset: { viewModel.resetTimer() },
-                onSkip: { viewModel.skipToNext() }
-            )
+                        Circle()
+                            .trim(from: 0, to: viewModel.progress)
+                            .stroke(Color(hex: "#7B61FF"), style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                            .frame(width: 250, height: 250)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.linear, value: viewModel.progress)
 
-            HStack(spacing: 32) {
-                StatView(title: "Current Streak", value: "\(viewModel.currentStreak)")
-                StatView(title: "Session Type", value: viewModel.currentSession.type.rawValue.capitalized)
-            }
-            .padding(.top, 32)
-            
-            if let task = task {
-                Button(action: {
-                    // Mark task as completed when all estimated sessions are done
-                    if viewModel.sessionsCompleted >= task.estimatedSessions {
-                        Task {
-                            var updatedTask = task
-                            updatedTask.isCompleted = true
-                            try? await TaskDataService().updateTask(updatedTask)
+                        VStack(spacing: 8) {
+                            Text(viewModel.formattedTime)
+                                .font(.system(size: 48, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+
+                            Text("\(viewModel.sessionsCompleted) sessions completed")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
                     }
-                    dismiss()
-                }) {
-                    Text("Complete Task")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .cornerRadius(12)
+
+                    TimerControlsView(
+                        isTimerActive: viewModel.isTimerActive,
+                        onStart: { viewModel.startTimer() },
+                        onPause: { viewModel.pauseTimer() },
+                        onReset: { viewModel.resetTimer() },
+                        onSkip: { viewModel.skipToNext() }
+                    )
+
+                    HStack(spacing: 32) {
+                        StatView(title: "Current Streak", value: "\(viewModel.currentStreak)")
+                        StatView(title: "Session Type", value: viewModel.currentSession.type.rawValue.capitalized)
+                    }
+                    .padding(.top, 32)
+                    
+                    Button(action: {
+                        // Mark task as completed when all estimated sessions are done
+                        if viewModel.sessionsCompleted >= task.estimatedSessions {
+                            Task {
+                                print("[DEBUG] PomodoroView - Completing task with initialized service: isInitialized=\(taskService.isInitialized)")
+                                var updatedTask = task
+                                updatedTask.isCompleted = true
+                                try? await taskService.updateTask(updatedTask)
+                            }
+                        }
+                        dismiss()
+                    }) {
+                        Text("Complete Task")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.green)
+                            .cornerRadius(12)
+                    }
+                    .disabled(viewModel.sessionsCompleted < task.estimatedSessions)
+                    .opacity(viewModel.sessionsCompleted >= task.estimatedSessions ? 1 : 0.5)
+                    .padding(.top)
+
+                    Button(action: {
+                        print("[DEBUG] PomodoroView - Manual close button tapped")
+                        dismiss()
+                    }) {
+                        Text("Exit Pomodoro")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(12)
+                    }
+                    .padding(.top)
                 }
-                .disabled(viewModel.sessionsCompleted < task.estimatedSessions)
-                .opacity(viewModel.sessionsCompleted >= task.estimatedSessions ? 1 : 0.5)
-                .padding(.top)
+                .padding()
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Close") {
+                            print("[DEBUG] PomodoroView - Close button tapped")
+                            dismiss()
+                        }
+                    }
+                }
+                .onChange(of: scenePhase) { phase in
+                    print("[DEBUG] PomodoroView - scenePhase changed to: \(phase)")
+                    switch phase {
+                    case .active:
+                        viewModel.handleForegroundTransition()
+                    case .inactive:
+                        viewModel.handleBackgroundTransition()
+                    default:
+                        break
+                    }
+                }
+                .onAppear {
+                    print("[DEBUG] PomodoroView - Main content appeared")
+                    if !viewModel.isTimerActive {
+                        print("[DEBUG] PomodoroView - Auto-starting timer")
+                        viewModel.startTimer()
+                    }
+                }
+                .onDisappear {
+                    print("[DEBUG] PomodoroView - Main content disappeared")
+                }
+                .alert("Error", isPresented: Binding(
+                    get: { viewModel.error != nil },
+                    set: { if !$0 { viewModel.error = nil } }
+                )) {
+                    Button("OK") { viewModel.error = nil }
+                } message: {
+                    Text(viewModel.error ?? "")
+                }
             }
-        }
-        .padding()
-        .onChange(of: scenePhase) { phase in
-            switch phase {
-            case .active:
-                viewModel.handleForegroundTransition()
-            case .inactive:
-                viewModel.handleBackgroundTransition()
-            default:
-                break
-            }
-        }
-        .alert("Error", isPresented: Binding(
-            get: { viewModel.error != nil },
-            set: { if !$0 { viewModel.error = nil } }
-        )) {
-            Button("OK") { viewModel.error = nil }
-        } message: {
-            Text(viewModel.error ?? "")
+            .interactiveDismissDisabled(true)
         }
     }
 }
@@ -148,5 +202,18 @@ struct StatView: View {
 }
 
 #Preview {
-    PomodoroView()
+    PomodoroView(
+        task: TodoTask(
+            id: "preview-id",
+            title: "Sample Task",
+            description: "This is a sample task",
+            isCompleted: false,
+            estimatedMinutes: 50,
+            dueDate: Date(),
+            createdAt: Date(),
+            updatedAt: Date(),
+            userId: "preview-user"
+        ),
+        taskService: TaskDataService()
+    )
 }

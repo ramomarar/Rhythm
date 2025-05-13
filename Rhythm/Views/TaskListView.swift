@@ -25,6 +25,7 @@ struct TaskListView: View {
     @State private var selectedTask: TodoTask?
     @State private var showingTaskDetail = false
     @State private var pomodoroTask: TodoTask? = nil
+    @State private var pomodoroTriggered = false
     
     init(initialFilter: TaskFilter? = nil) {
         _selectedFilter = State(initialValue: initialFilter ?? .all)
@@ -55,7 +56,6 @@ struct TaskListView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Filter Picker
                 Picker("Filter", selection: $selectedFilter) {
                     ForEach(TaskFilter.allCases, id: \.self) { filter in
                         Text(filter.rawValue).tag(filter)
@@ -64,7 +64,7 @@ struct TaskListView: View {
                 .pickerStyle(.segmented)
                 .padding()
                 
-                if isLoading {
+                if !taskService.isInitialized || isLoading {
                     ProgressView("Loading tasks...")
                 } else if filteredTasks.isEmpty {
                     VStack(spacing: 16) {
@@ -84,7 +84,11 @@ struct TaskListView: View {
                             TaskRowView(task: task)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    selectedTask = task
+                                    if let latestTask = taskService.tasks.first(where: { $0.id == task.id }) {
+                                        selectedTask = latestTask
+                                    } else {
+                                        selectedTask = task
+                                    }
                                     showingTaskDetail = true
                                 }
                         }
@@ -93,41 +97,72 @@ struct TaskListView: View {
                         }
                     }
                     .refreshable {
-                        Task {
-                            await loadTasks()
-                        }
+                        await loadTasks()
                     }
                 }
             }
-            .navigationTitle("Tasks")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddTask = true }) {
-                        Image(systemName: "plus")
-                    }
+            .navigationBarTitle("Tasks", displayMode: .inline)
+            .navigationBarItems(trailing: 
+                Button(action: { showingAddTask = true }) {
+                    Image(systemName: "plus")
                 }
-            }
+            )
             .sheet(isPresented: $showingAddTask) {
                 TaskDetailView(taskService: taskService)
             }
-            .sheet(isPresented: $showingTaskDetail) {
-                if let task = selectedTask {
-                    TaskDetailSheet(
-                        task: task,
-                        taskService: taskService,
-                        onStartPomodoro: {
-                            pomodoroTask = task
-                            showingPomodoro = true
+            .sheet(item: $selectedTask) { task in
+                TaskDetailSheet(
+                    task: task,
+                    taskService: taskService,
+                    onStartPomodoro: {
+                        var taskCopy = task
+                        
+                        if let id = task.id {
+                            taskCopy.id = id
                         }
-                    )
+                        
+                        pomodoroTask = taskCopy
+                        pomodoroTriggered = true
+                        
+                        selectedTask = nil
+                    }
+                )
+            }
+            .onChange(of: selectedTask) { newValue in
+                if newValue == nil && pomodoroTriggered {
+                    pomodoroTriggered = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        showingPomodoro = true
+                    }
                 }
             }
-            .fullScreenCover(isPresented: $showingPomodoro, onDismiss: {
-                pomodoroTask = nil
-            }) {
-                if let task = pomodoroTask {
-                    PomodoroView(task: task)
+            .fullScreenCover(isPresented: $showingPomodoro) {
+                ZStack {
+                    if let task = pomodoroTask {
+                        PomodoroView(task: task, taskService: taskService)
+                            .onAppear {
+                            }
+                            .onDisappear {
+                            }
+                    } else {
+                        VStack(spacing: 16) {
+                            Text("No task selected for Pomodoro")
+                                .font(.headline)
+                            
+                            Button("Close") {
+                                showingPomodoro = false
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                        }
+                        .padding()
+                        .onAppear {
+                        }
+                    }
                 }
+                .interactiveDismissDisabled()
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
                 Button("OK") { errorMessage = nil }
@@ -137,7 +172,6 @@ struct TaskListView: View {
         }
         .task {
             await loadTasks()
-            taskService.observeTasks()
         }
     }
     
@@ -247,16 +281,24 @@ struct TaskDetailSheet: View {
                     
                     // Action Buttons
                     VStack(spacing: 12) {
-                        Button(action: { onStartPomodoro() }) {
+                        Button(action: {
+                            onStartPomodoro()
+                            dismiss()
+                        }) {
                             HStack {
                                 Image(systemName: "timer")
                                 Text("Start Pomodoro Session")
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color(hex: "#7B61FF"))
+                            .background(taskService.isInitialized ? Color(hex: "#7B61FF") : Color.gray)
                             .foregroundColor(.white)
                             .cornerRadius(12)
+                        }
+                        .disabled(!taskService.isInitialized)
+                        
+                        if !taskService.isInitialized {
+                            ProgressView("Loading task data...")
                         }
                         
                         Button(action: { showingEditSheet = true }) {

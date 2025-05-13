@@ -48,16 +48,29 @@ class TimerViewModel: ObservableObject {
 
     init(task: TodoTask? = nil) {
         self.task = task
+        print("[DEBUG] TimerViewModel - Initialized with task: \(task?.id ?? "nil"), title: \(task?.title ?? "nil")")
+        
         self.currentSession = Session(type: .focus, duration: 25 * 60)
         self.timeRemaining = 25 * 60
+        
+        // Load settings
+        if let focusDuration = UserDefaults.standard.object(forKey: "focusDuration") as? Int, focusDuration > 0 {
+            print("[DEBUG] TimerViewModel - Loaded focus duration from settings: \(focusDuration) minutes")
+            self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
+            self.timeRemaining = focusDuration * 60
+        }
+        
         setupSettingsObserver()
     }
     
     private func setupSettingsObserver() {
+        print("[DEBUG] TimerViewModel - Setting up observers")
         NotificationCenter.default.publisher(for: .pomodoroSettingsDidChange)
             .sink { [weak self] notification in
                 guard let self = self,
                       let userInfo = notification.userInfo else { return }
+                
+                print("[DEBUG] TimerViewModel - Settings changed notification received")
                 
                 let wasActive = self.isTimerActive
                 if wasActive {
@@ -65,6 +78,7 @@ class TimerViewModel: ObservableObject {
                 }
                 
                 if let focusDuration = userInfo["focusDuration"] as? Int {
+                    print("[DEBUG] TimerViewModel - Updating focus duration to: \(focusDuration) minutes")
                     self.currentSession = Session(type: .focus, duration: TimeInterval(focusDuration * 60))
                     self.timeRemaining = focusDuration * 60
                 }
@@ -78,6 +92,7 @@ class TimerViewModel: ObservableObject {
     
     func startTimer() {
         guard !isTimerActive else { return }
+        print("[DEBUG] TimerViewModel - Starting timer")
         isTimerActive = true
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
